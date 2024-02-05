@@ -6,6 +6,7 @@ using AutoMapper;
 using MzTNR.Contracts.Ciudades.DTOs;
 using MzTNR.Contracts.Ciudades.RequestResponses;
 using MzTNR.Contracts.Equipos.Modelos;
+using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Contracts.Provincias.DTOs;
 using MzTNR.Data.Models.TNR;
 
@@ -26,6 +27,7 @@ namespace MzTNR.Services.Profiles
             
             #region Equipos
             CreateMap<Equipo, ResumenEquipo>();
+            CreateMap<CrearEquipoRequest, Equipo>();
             #endregion
         }   
     }

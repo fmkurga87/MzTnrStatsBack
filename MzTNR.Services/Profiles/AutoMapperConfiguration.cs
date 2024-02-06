@@ -8,6 +8,7 @@ using MzTNR.Contracts.Ciudades.RequestResponses;
 using MzTNR.Contracts.Equipos.Modelos;
 using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Contracts.Provincias.DTOs;
+using MzTNR.Contracts.Provincias.RequestResponses;
 using MzTNR.Data.Models.TNR;
 
 namespace MzTNR.Services.Profiles
@@ -23,6 +24,7 @@ namespace MzTNR.Services.Profiles
 
             #region Provincias
             CreateMap<Provincia, ProvinciaDTO>();
+            CreateMap<CrearProvinciaRequest, Provincia>();
             #endregion
             
             #region Equipos

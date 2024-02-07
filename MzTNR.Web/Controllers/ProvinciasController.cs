@@ -33,5 +33,14 @@ namespace MzTNR.Web.Controllers
 
             return Ok(crearProvinciaResponse);
         }
+
+        [HttpGet]
+        [Route("Provincia")]
+        public async Task<ActionResult> Get([FromQuery] ObtenerProvinciaRequest obtenerProvinciaRequest)
+        {
+            var obtenerProvinciaResponse = await _servicioProvincias.ObtenerProvincia(obtenerProvinciaRequest);
+
+            return Ok(obtenerProvinciaResponse);
+        }
     }
 }

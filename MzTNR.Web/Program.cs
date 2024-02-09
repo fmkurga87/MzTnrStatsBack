@@ -1,9 +1,11 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MzTNR.Contracts.Ciudades;
 using MzTNR.Contracts.Equipos;
 using MzTNR.Contracts.Provincias;
 using MzTNR.Services.Ciudades;
 using MzTNR.Services.Equipos;
+using MzTNR.Services.Extensiones;
 using MzTNR.Services.Profiles;
 using MzTNR.Services.Provincias;
 
@@ -26,6 +28,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+Configure(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -40,3 +44,31 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void Configure(WebApplication host)
+{
+    using var scope = host.Services.CreateScope();
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var dbContext = services.GetRequiredService<MzTNR.Data.Data.ApplicationDbContext>();
+        var mapper = services.GetRequiredService<IMapper>();
+
+        // if (dbContext.Database.IsSqlServer())
+        // {
+        //     dbContext.Database.Migrate();
+        // }
+
+        // var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        // var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+        // AppDbContextSeed.SeedData(userManager, roleManager);
+        DataSeed dataSeed = new DataSeed(dbContext, mapper){};
+        dataSeed.Seeding();
+    }
+    catch (Exception ex)
+    {
+        //Log some error
+        throw;
+    }
+}

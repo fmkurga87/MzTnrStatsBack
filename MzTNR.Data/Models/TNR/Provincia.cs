@@ -9,6 +9,7 @@ namespace MzTNR.Data.Models.TNR
     {
         public int Id { get; set; }
         public string? Nombre { get; set; }
+        public int Codigo { get; set; }
         public ICollection<Ciudad>? Ciudades { get; set; }
     }
 }

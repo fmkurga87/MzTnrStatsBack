@@ -34,9 +34,13 @@ namespace MzTNR.Services.Provincias
         
         public async Task<BuscarProvinciasResponse> BuscarProvincias(BuscarProvinciasRequest request)
         {
-             var provincias = await _applicationDbContext.Provincias.Where(ObtenerPredicadoProvincias(request)).ToListAsync();
+             var provincias = await _applicationDbContext.Provincias.Where(ObtenerPredicadoProvincias(request)).OrderBy(x => x.Nombre).ToListAsync();
 
-            return new BuscarProvinciasResponse(request){ Elementos = _mapper.Map<List<ProvinciaDTO>>(provincias.Paginate(request))};
+            return new BuscarProvinciasResponse(request)
+            { 
+                Elementos = _mapper.Map<List<ProvinciaDTO>>(provincias.Paginate(request)),
+                CantidadTotal = provincias.Count()
+            };
         }
 
         public async Task<CrearProvinciaResponse> CrearProvincia(CrearProvinciaRequest request)
@@ -96,6 +100,8 @@ namespace MzTNR.Services.Provincias
         private static Expression<Func<Provincia, bool>> ObtenerPredicadoProvincias(BuscarProvinciasRequest request)
         {
             var predicado = PredicateBuilder.New<Provincia>();
+
+            predicado.And(x => x.Borrado == false);
 
             if (!String.IsNullOrEmpty(request.Nombre))
             {

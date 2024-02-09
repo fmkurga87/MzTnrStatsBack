@@ -15,7 +15,7 @@ namespace MzTNR.Web.Controllers
     {
         public IServicioProvincias _servicioProvincias { get; }
         public IMapper _mapper { get; }
-        private readonly ILogger<ProvinciasController> _logger;        
+        private readonly ILogger<ProvinciasController> _logger;
 
         public ProvinciasController(IServicioProvincias servicioProvincias, IMapper mapper, ILogger<ProvinciasController> logger )
         {
@@ -35,10 +35,19 @@ namespace MzTNR.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Provincia")]
-        public async Task<ActionResult> Get([FromQuery] ObtenerProvinciaRequest obtenerProvinciaRequest)
+        [Route("Provincia/{Id}")]
+        public async Task<ActionResult> Get([FromRoute] ObtenerProvinciaRequest obtenerProvinciaRequest)
         {
             var obtenerProvinciaResponse = await _servicioProvincias.ObtenerProvincia(obtenerProvinciaRequest);
+
+            return Ok(obtenerProvinciaResponse);
+        }
+
+        [HttpGet]
+        [Route("Provincia")]
+        public async Task<ActionResult> Get([FromQuery] BuscarProvinciasRequest buscarProvinciaRequest)
+        {
+            var obtenerProvinciaResponse = await _servicioProvincias.BuscarProvincias(buscarProvinciaRequest);
 
             return Ok(obtenerProvinciaResponse);
         }

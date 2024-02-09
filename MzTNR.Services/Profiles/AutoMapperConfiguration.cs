@@ -26,7 +26,8 @@ namespace MzTNR.Services.Profiles
             CreateMap<Provincia, ProvinciaDTO>();
             CreateMap<ProvinciaCsv, Provincia>()
                 .ForMember(dest => dest.Codigo, opt => opt.MapFrom(source => int.Parse(source.id)))
-                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(source => source.nombre));
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(source => source.nombre))
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<CrearProvinciaRequest, Provincia>();
             #endregion
             

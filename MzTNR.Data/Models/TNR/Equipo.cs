@@ -12,6 +12,7 @@ namespace MzTNR.Data.Models.TNR
         public string? UsuarioMZ { get; set; }
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
+        public bool Borrado { get; set; }
 
         public virtual Ciudad? Ciudad { get; set; }
         public int? CiudadId { get; set; }       

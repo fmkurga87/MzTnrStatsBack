@@ -25,7 +25,6 @@ namespace MzTNR.Web.Controllers
         }
 
         [HttpPost]
-        [Route("Provincia")]
         public async Task<ActionResult> Post([FromBody] CrearProvinciaRequest crearProvinciaRequest)
         {
             // TODO: Validar request
@@ -44,7 +43,6 @@ namespace MzTNR.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Provincia")]
         public async Task<ActionResult> Get([FromQuery] BuscarProvinciasRequest buscarProvinciaRequest)
         {
             var obtenerProvinciaResponse = await _servicioProvincias.BuscarProvincias(buscarProvinciaRequest);

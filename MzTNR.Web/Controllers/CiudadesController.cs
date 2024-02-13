@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MzTNR.Contracts.Ciudades;
+using MzTNR.Contracts.Ciudades.RequestResponses;
 using MzTNR.Data.Data;
 
 namespace MzTNR.Web.Controllers
@@ -23,6 +24,40 @@ namespace MzTNR.Web.Controllers
             _mapper = mapper;
             _logger = logger;
         }
-        
+
+        [HttpPost]
+        public async Task<ActionResult> Post([FromBody] CrearCiudadRequest crearCiudadRequest)
+        {
+            // TODO: Validar request
+            var crearCiudadResponse = await _servicioCiudades.CrearCiudad(crearCiudadRequest);
+
+            return Ok(crearCiudadResponse);
+        }
+    
+        [HttpPut]
+        public async Task<ActionResult> Put([FromBody] ModificarCiudadRequest modificarCiudadRequest)
+        {
+            // TODO: Validar request
+            var modificarCiudadResponse = await _servicioCiudades.ModificarCiudad(modificarCiudadRequest);
+
+            return Ok(modificarCiudadResponse);
+        }
+
+        [HttpGet]
+        [Route("{Id}")]
+        public async Task<ActionResult> Get([FromRoute] ObtenerCiudadRequest obtenerCiudadRequest)
+        {
+            var obtenerCiudadResponse = await _servicioCiudades.ObtenerCiudad(obtenerCiudadRequest);
+
+            return Ok(obtenerCiudadResponse);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Get([FromQuery] BuscarCiudadesRequest buscarCiudadRequest)
+        {
+            var obtenerCiudadResponse = await _servicioCiudades.BuscarCiudades(buscarCiudadRequest);
+
+            return Ok(obtenerCiudadResponse);
+        }
     }
 }

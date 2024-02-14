@@ -34,7 +34,7 @@ namespace MzTNR.Web.Controllers
         }
 
         [HttpGet]
-        [Route("Provincia/{Id}")]
+        [Route("{Id}")]
         public async Task<ActionResult> Get([FromRoute] ObtenerProvinciaRequest obtenerProvinciaRequest)
         {
             var obtenerProvinciaResponse = await _servicioProvincias.ObtenerProvincia(obtenerProvinciaRequest);

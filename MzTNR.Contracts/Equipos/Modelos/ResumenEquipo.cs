@@ -7,6 +7,7 @@ namespace MzTNR.Contracts.Equipos.Modelos
 {
     public class ResumenEquipo
     {
+        public int? IdMz { get; set; }
         public string? NombreEquipo { get; set; }
         public string? UsuarioMZ { get; set; }
     }

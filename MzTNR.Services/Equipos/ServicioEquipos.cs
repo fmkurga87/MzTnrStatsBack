@@ -70,6 +70,7 @@ namespace MzTNR.Services.Equipos
 
         public Task<ObtenerEquipoResponse> ObtenerEquipo(ObtenerEquipoRequest request)
         {
+            ObtenerEquipoResponse obtenerEquipoResponse = new ObtenerEquipoResponse() { Encontrado = true};
             throw new NotImplementedException();
         }
 

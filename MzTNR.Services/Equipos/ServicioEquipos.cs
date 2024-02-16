@@ -10,6 +10,7 @@ using MzTNR.Contracts.Equipos;
 using MzTNR.Contracts.Equipos.DTOs;
 using MzTNR.Contracts.Equipos.Modelos;
 using MzTNR.Contracts.Equipos.RequestResponses;
+using MzTNR.Contracts.Partidos;
 using MzTNR.Data.Data;
 using MzTNR.Data.Models.TNR;
 using MzTNR.Services.Extensiones;
@@ -20,11 +21,13 @@ namespace MzTNR.Services.Equipos
     {
         private ApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
+        private readonly IServicioPartidos _servicioPartidos;
 
-        public ServicioEquipos(ApplicationDbContext applicationDbContext, IMapper mapper)
+        public ServicioEquipos(ApplicationDbContext applicationDbContext, IMapper mapper, IServicioPartidos servicioPartidos)
         {
             _applicationDbContext = applicationDbContext;
             _mapper = mapper;
+            _servicioPartidos = servicioPartidos;
         }
         
         public async Task<BuscarEquiposResponse> BuscarEquipos(BuscarEquiposRequest request)
@@ -90,8 +93,9 @@ namespace MzTNR.Services.Equipos
                   
                     UrlEscudo = $"https://www.managerzone.com/dynimg/badge.php?team_id={equipo.IdMz}&sport=soccer",
                     // TODO: Agregar una fx que reciba id de equipo MZ y si se consultan partidos jugados o proximos, y se obtnega el xml
-                    //PartidosJugados = 
-                    //PartidosProximos = 
+                    // Esta Fx deberia estar en ServicioPartidos
+                    PartidosJugados = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz.Value, 1),
+                    PartidosProximos = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz.Value, 2)
                 };
                 obtenerEquipoResponse.Equipo = datosEquipo;
                 

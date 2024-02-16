@@ -2,10 +2,12 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MzTNR.Contracts.Ciudades;
 using MzTNR.Contracts.Equipos;
+using MzTNR.Contracts.Partidos;
 using MzTNR.Contracts.Provincias;
 using MzTNR.Services.Ciudades;
 using MzTNR.Services.Equipos;
 using MzTNR.Services.Extensiones;
+using MzTNR.Services.Partidos;
 using MzTNR.Services.Profiles;
 using MzTNR.Services.Provincias;
 
@@ -20,6 +22,7 @@ builder.Services.AddDbContext<MzTNR.Data.Data.ApplicationDbContext>(options =>
 builder.Services.AddScoped<IServicioProvincias, ServicioProvincias>();
 builder.Services.AddScoped<IServicioCiudades, ServicioCiudades>();
 builder.Services.AddScoped<IServicioEquipos, ServicioEquipos>();
+builder.Services.AddScoped<IServicioPartidos, ServicioPartidos>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

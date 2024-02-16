@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MzTNR.Contracts.Equipos.DTOs;
+using MzTNR.Contracts.Partidos.Modelos;
 
 namespace MzTNR.Contracts.Equipos.Modelos
 {
@@ -17,7 +18,8 @@ namespace MzTNR.Contracts.Equipos.Modelos
 
         //TODO: Armar la URL por codigo
         public string? UrlEscudo { get; set; }
+        public List<ResumenPartido> PartidosJugados { get; set; }
+        public List<ResumenPartido> PartidosProximos { get; set; }
 
-        //TODO: Agregar lista de ultimos partidos y proximos partidos
     }
 }

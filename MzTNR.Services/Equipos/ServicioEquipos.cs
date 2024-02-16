@@ -68,10 +68,41 @@ namespace MzTNR.Services.Equipos
             return response;
         }
 
-        public Task<ObtenerEquipoResponse> ObtenerEquipo(ObtenerEquipoRequest request)
+        public async Task<ObtenerEquipoResponse> ObtenerEquipo(ObtenerEquipoRequest request)
         {
             ObtenerEquipoResponse obtenerEquipoResponse = new ObtenerEquipoResponse() { Encontrado = true};
-            throw new NotImplementedException();
+
+            var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.Id == request.Id);
+
+            if (equipo != null)
+            {
+                EquipoCompleto datosEquipo = new EquipoCompleto() 
+                {
+                    IdMz = equipo.IdMz,
+                    NombreEquipo = equipo.NombreEquipo,
+                    UsuarioMZ = equipo.UsuarioMZ,
+                    Nombre = equipo.Nombre,
+                    Apellido = equipo.Apellido,
+                    
+                    //TODO: Mostrar solo los nombres (usar ResumenCiudad -> Agregar mapeo)
+                    //Ciudad =
+                    //Provincia = 
+                  
+                    UrlEscudo = $"https://www.managerzone.com/dynimg/badge.php?team_id={equipo.IdMz}&sport=soccer",
+                    // TODO: Agregar una fx que reciba id de equipo MZ y si se consultan partidos jugados o proximos, y se obtnega el xml
+                    //PartidosJugados = 
+                    //PartidosProximos = 
+                };
+                obtenerEquipoResponse.Equipo = datosEquipo;
+                
+            }
+            else
+            {
+                obtenerEquipoResponse.Encontrado = false;
+                obtenerEquipoResponse.AddError("Equipo", $"No se encontro el Equipo con id: {request.Id}");
+            }
+
+            return obtenerEquipoResponse;
         }
 
         private static Expression<Func<Equipo, bool>> ObtenerPredicadoEquipos(BuscarEquiposRequest request)

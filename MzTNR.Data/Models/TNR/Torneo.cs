@@ -8,6 +8,7 @@ namespace MzTNR.Data.Models.TNR
     public class Torneo
     {
         public int Id { get; set; }
+        public int IdMz { get; set; }
         public string? Nombre { get; set; }
         public int Edicion { get; set; }
         public int TemporadaMZ { get; set; }

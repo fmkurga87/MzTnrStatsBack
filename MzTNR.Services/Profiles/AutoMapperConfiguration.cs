@@ -22,6 +22,11 @@ namespace MzTNR.Services.Profiles
             CreateMap<CrearCiudadRequest, Ciudad>();
             #endregion
 
+            #region Equipos
+            CreateMap<Equipo, ResumenEquipo>();
+            CreateMap<CrearEquipoRequest, Equipo>();
+            #endregion
+            
             #region Provincias
             CreateMap<Provincia, ProvinciaDTO>();
             CreateMap<ProvinciaCsv, Provincia>()
@@ -30,11 +35,7 @@ namespace MzTNR.Services.Profiles
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<CrearProvinciaRequest, Provincia>();
             #endregion
-            
-            #region Equipos
-            CreateMap<Equipo, ResumenEquipo>();
-            CreateMap<CrearEquipoRequest, Equipo>();
-            #endregion
+                        
         }   
     }
 }

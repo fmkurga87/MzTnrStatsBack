@@ -9,6 +9,9 @@ using MzTNR.Contracts.Equipos.Modelos;
 using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Contracts.Provincias.DTOs;
 using MzTNR.Contracts.Provincias.RequestResponses;
+using MzTNR.Contracts.Torneos.DTOs;
+using MzTNR.Contracts.Torneos.Modelos;
+using MzTNR.Contracts.Torneos.RequestResponses;
 using MzTNR.Data.Models.TNR;
 
 namespace MzTNR.Services.Profiles
@@ -35,7 +38,13 @@ namespace MzTNR.Services.Profiles
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<CrearProvinciaRequest, Provincia>();
             #endregion
-                        
+
+            #region Torneos
+                CreateMap<Torneo, TorneoDTO>();
+                CreateMap<Torneo, TorneoCompleto>();
+                CreateMap<CrearTorneoRequest, Torneo>();
+            #endregion
+
         }   
     }
 }

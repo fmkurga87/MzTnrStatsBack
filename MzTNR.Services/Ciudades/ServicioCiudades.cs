@@ -77,6 +77,7 @@ namespace MzTNR.Services.Ciudades
             
             if (ciudad == null)
             {
+                response.AddError("Ciudad", $"No se encontro la ciudad con id: {request.Id}");
                 response.Encontrado = false;
             }
             else

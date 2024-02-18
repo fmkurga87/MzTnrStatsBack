@@ -9,6 +9,6 @@ namespace MzTNR.Contracts.Torneos.RequestResponses
 {
     public class ObtenerTorneoResponse : BaseResponseWithFound
     {
-        public ResumenTorneo? Torneo { get; set; }
+        public TorneoCompleto? Torneo { get; set; }
     }
 }

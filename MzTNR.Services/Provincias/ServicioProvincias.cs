@@ -80,6 +80,7 @@ namespace MzTNR.Services.Provincias
             
             if (provincia == null)
             {
+                response.AddError("Provincia", $"No se encontro la provincia con id: {request.Id}");
                 response.Encontrado = false;
             }
             else

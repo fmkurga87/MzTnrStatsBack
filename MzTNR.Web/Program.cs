@@ -60,7 +60,7 @@ void Configure(WebApplication host)
     {
         var dbContext = services.GetRequiredService<MzTNR.Data.Data.ApplicationDbContext>();
         var mapper = services.GetRequiredService<IMapper>();
-
+        
         // if (dbContext.Database.IsSqlServer())
         // {
         //     dbContext.Database.Migrate();

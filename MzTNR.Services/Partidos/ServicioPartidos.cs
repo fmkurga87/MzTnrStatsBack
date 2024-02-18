@@ -5,16 +5,28 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using AutoMapper;
 using MzTNR.Contracts.Compartidos;
 using MzTNR.Contracts.Partidos;
 using MzTNR.Contracts.Partidos.DTOs;
 using MzTNR.Contracts.Partidos.Modelos;
+using MzTNR.Data.Data;
 using static MzTNR.Contracts.Partidos.DTOs.ListaPartidosXML;
 
 namespace MzTNR.Services.Partidos
 {
     public class ServicioPartidos : IServicioPartidos
     {
+        private ApplicationDbContext _applicationDbContext;
+        private readonly IMapper _mapper;
+        
+        public ServicioPartidos(ApplicationDbContext applicationDbContext, IMapper mapper)
+        {
+            _mapper = mapper;
+            _applicationDbContext = applicationDbContext;
+            
+        }
+
         public async Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos)
         {
             // TODO: Agregar la inteligencia para guardar la info de los partidos que correspondan al TNR (identificarlos en la respuesta para que front los destaque)
@@ -37,16 +49,24 @@ namespace MzTNR.Services.Partidos
                     string typeName = matchElement.Attribute("typeName")?.Value ?? "";
                     string typeId = matchElement.Attribute("typeId")?.Value ?? "";
 
+                    bool partidoDeTNR = false;
+
                     if (type == "")
                     {
                         resumenPartidoActual.TipoPartido = EnumTipoPartidoEng.other;
-                        resumenPartidoActual.EsTNR = false;
+                        resumenPartidoActual.EsTNR = partidoDeTNR;
                         resumenPartidoActual.NombreTorneo = "";
                     }
                     else
                     {
+                        // Verificamos si pertenece al TNR
+                        if (type != "friendly")
+                        {
+                            partidoDeTNR = _applicationDbContext.Torneos.Any(x => x.IdMz == int.Parse(typeId));
+                        }
+                                                
                         resumenPartidoActual.TipoPartido = Enum.Parse<EnumTipoPartidoEng>(type);
-                        resumenPartidoActual.EsTNR = false; // TODO: Generar validacion
+                        resumenPartidoActual.EsTNR = partidoDeTNR;
                         resumenPartidoActual.NombreTorneo = typeName;
                     }
 

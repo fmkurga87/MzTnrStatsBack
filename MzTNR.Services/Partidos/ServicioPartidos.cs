@@ -15,6 +15,7 @@ using MzTNR.Contracts.Partidos.Modelos;
 using MzTNR.Contracts.Partidos.RequetResponses;
 using MzTNR.Data.Data;
 using MzTNR.Data.Models.TNR;
+using static MzTNR.Contracts.Partidos.DTOs.DetallePartidoXML;
 using static MzTNR.Contracts.Partidos.DTOs.ListaPartidosXML;
 
 namespace MzTNR.Services.Partidos
@@ -45,10 +46,13 @@ namespace MzTNR.Services.Partidos
             throw new NotImplementedException();
         }
 
-        public Task<ObtenerPartidoResponse> ObtenerPartido(ObtenerPartidoRequest request)
+        public async Task<ObtenerPartidoResponse> ObtenerPartido(ObtenerPartidoRequest request)
         {
-            // TODO: Crear ObtenerFichaPartidoXML que llame al XML https://www.managerzone.com/?p=xml_content&xid=16 => http://www.managerzone.com/xml/match_info.php?sport_id=1&match_id=45646
-            throw new NotImplementedException();
+            return new ObtenerPartidoResponse() {
+                Encontrado = true,
+                Partido = await ObtenerFichaPartidoXML(request.Id)
+            };
+            
         }
 
         public async Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos)
@@ -122,7 +126,126 @@ namespace MzTNR.Services.Partidos
             return resumenPartidos;
         }
 
-        private static Expression<Func<Partido, bool>> ObtenerPredicadoProvincias(BuscarPartidosRequest request)
+        public async Task<DetallePartidoXML> ObtenerFichaPartidoXML(int idPartido)
+        {
+            DetallePartidoXML detallePartidoXML = new DetallePartidoXML();
+            
+            // Obtengo el XML
+            string urlXmlPartidos = $"http://www.managerzone.com/xml/match_info.php?sport_id=1&match_id={idPartido}";
+            XDocument xmlPartidos = XDocument.Load(urlXmlPartidos);
+
+            // TODO: Parsearlo manualmente, asi falla
+            detallePartidoXML = (from m in xmlPartidos.Descendants("Match")
+                     select new DetallePartidoXML
+                     {
+                         Id = (int)m.Attribute("id"),
+                         Date = DateTime.Parse((string)m.Attribute("date")),
+                         Type = (int)m.Attribute("type"),
+                         Sport = (string)m.Attribute("sport"),
+                         Spectators = (int)m.Attribute("spectators"),
+                         HomeTeam = (from t in m.Elements("Team")
+                                     where (string)t.Attribute("field") == "home"
+                                     select new TeamMatch
+                                     {
+                                         Id = (int)t.Attribute("id"),
+                                         Name = (string)t.Attribute("name"),
+                                         ShortName = (string)t.Attribute("shortname"),
+                                         Country = (string)t.Attribute("country"),
+                                         Field = (string)t.Attribute("field"),
+                                         Goals = (int)t.Attribute("goals"),
+                                         Players = (from p in t.Elements("Player")
+                                                    select new PlayerMatch
+                                                    {
+                                                        Id = (int)p.Attribute("id"),
+                                                        Name = (string)p.Attribute("name"),
+                                                        ShirtNumber = (int)p.Attribute("shirtno"),
+                                                        Goals = new Goals
+                                                        {
+                                                            Pro = (int)p.Element("Goals").Attribute("pro"),
+                                                            Own = (int)p.Element("Goals").Attribute("own")
+                                                        },
+                                                        Cards = (p.Element("Cards") != null) ? new Cards
+                                                        {
+                                                            Yellow = (int)p.Element("Cards").Attribute("yellow"),
+                                                            Red = (int)p.Element("Cards").Attribute("red")
+                                                        } : null
+                                                    }).ToList()
+                                     }).FirstOrDefault(),
+
+                         AwayTeam = (from t in m.Elements("Team")
+                                     where (string)t.Attribute("field") == "away"
+                                     select new TeamMatch
+                                     {
+                                         Id = (int)t.Attribute("id"),
+                                         Name = (string)t.Attribute("name"),
+                                         ShortName = (string)t.Attribute("shortname"),
+                                         Country = (string)t.Attribute("country"),
+                                         Field = (string)t.Attribute("field"),
+                                         Goals = (int)t.Attribute("goals"),
+                                         Players = (from p in t.Elements("Player")
+                                                    select new PlayerMatch
+                                                    {
+                                                        Id = (int)p.Attribute("id"),
+                                                        Name = (string)p.Attribute("name"),
+                                                        ShirtNumber = (int)p.Attribute("shirtno"),
+                                                        Goals = new Goals
+                                                        {
+                                                            Pro = (int)p.Element("Goals").Attribute("pro"),
+                                                            Own = (int)p.Element("Goals").Attribute("own")
+                                                        },
+                                                        Cards = (p.Element("Cards") != null) ? new Cards
+                                                        {
+                                                            Yellow = (int)p.Element("Cards").Attribute("yellow"),
+                                                            Red = (int)p.Element("Cards").Attribute("red")
+                                                        } : null
+                                                    }).ToList()
+                                     }).FirstOrDefault()
+                     }).FirstOrDefault();
+
+            // Console.WriteLine($"Match ID: {match.Id}");
+            // Console.WriteLine($"Date: {match.Date}");
+            // Console.WriteLine($"Type: {match.Type}");
+            // Console.WriteLine($"Sport: {match.Sport}");
+            // Console.WriteLine($"Spectators: {match.Spectators}");
+            // Console.WriteLine($"Home Team: {match.HomeTeam.Name}");
+            // Console.WriteLine($"Home Team Goals: {match.HomeTeam.Goals}");
+            // Console.WriteLine($"Away Team: {match.AwayTeam.Name}");
+            // Console.WriteLine($"Away Team Goals: {match.AwayTeam.Goals}");
+
+            // Console.WriteLine("\nHome Team Players:");
+            // foreach (var player in match.HomeTeam.Players)
+            // {
+            //     Console.WriteLine($"Player Name: {player.Name}");
+            //     Console.WriteLine($"Shirt Number: {player.ShirtNumber}");
+            //     Console.WriteLine($"Goals Scored: {player.Goals.Pro}");
+            //     Console.WriteLine($"Own Goals: {player.Goals.Own}");
+            //     if (player.Cards != null)
+            //     {
+            //         Console.WriteLine($"Yellow Cards: {player.Cards.Yellow}");
+            //         Console.WriteLine($"Red Cards: {player.Cards.Red}");
+            //     }
+            //     Console.WriteLine();
+            // }
+
+            // Console.WriteLine("\nAway Team Players:");
+            // foreach (var player in match.AwayTeam.Players)
+            // {
+            //     Console.WriteLine($"Player Name: {player.Name}");
+            //     Console.WriteLine($"Shirt Number: {player.ShirtNumber}");
+            //     Console.WriteLine($"Goals Scored: {player.Goals.Pro}");
+            //     Console.WriteLine($"Own Goals: {player.Goals.Own}");
+            //     if (player.Cards != null)
+            //     {
+            //         Console.WriteLine($"Yellow Cards: {player.Cards.Yellow}");
+            //         Console.WriteLine($"Red Cards: {player.Cards.Red}");
+            //     }
+            //     Console.WriteLine();
+            // }
+
+            return detallePartidoXML;
+        }
+
+        private static Expression<Func<Partido, bool>> ObtenerPredicadoPartidos(BuscarPartidosRequest request)
         {
             var predicado = PredicateBuilder.New<Partido>();
 

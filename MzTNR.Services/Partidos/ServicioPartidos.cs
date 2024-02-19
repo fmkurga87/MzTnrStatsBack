@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using AutoMapper;
+using LinqKit;
 using MzTNR.Contracts.Compartidos;
 using MzTNR.Contracts.Partidos;
 using MzTNR.Contracts.Partidos.DTOs;
 using MzTNR.Contracts.Partidos.Modelos;
+using MzTNR.Contracts.Partidos.RequetResponses;
 using MzTNR.Data.Data;
+using MzTNR.Data.Models.TNR;
 using static MzTNR.Contracts.Partidos.DTOs.ListaPartidosXML;
 
 namespace MzTNR.Services.Partidos
@@ -26,10 +30,30 @@ namespace MzTNR.Services.Partidos
             _applicationDbContext = applicationDbContext;
             
         }
+        public Task<BuscarPartidosResponse> BuscarPartidos(BuscarPartidosRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CrearPartidoResponse> CrearPartido(CrearPartidoRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ModificarPartidoResponse> ModificarPartido(ModificarPartidoRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ObtenerPartidoResponse> ObtenerPartido(ObtenerPartidoRequest request)
+        {
+            // TODO: Crear ObtenerFichaPartidoXML que llame al XML https://www.managerzone.com/?p=xml_content&xid=16 => http://www.managerzone.com/xml/match_info.php?sport_id=1&match_id=45646
+            throw new NotImplementedException();
+        }
 
         public async Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos)
         {
-            // TODO: Agregar la inteligencia para guardar la info de los partidos que correspondan al TNR (identificarlos en la respuesta para que front los destaque)
+            // TODO: Agregar la inteligencia para guardar la info de los partidos que correspondan al TNR
             List<ResumenPartido> resumenPartidos = new List<ResumenPartido>();
 
             // Obtengo el XML
@@ -98,6 +122,23 @@ namespace MzTNR.Services.Partidos
             return resumenPartidos;
         }
 
-        // TODO: Crear ObtenerFichaPartidoXML que llame al XML https://www.managerzone.com/?p=xml_content&xid=16 => http://www.managerzone.com/xml/match_info.php?sport_id=1&match_id=45646
+        private static Expression<Func<Partido, bool>> ObtenerPredicadoProvincias(BuscarPartidosRequest request)
+        {
+            var predicado = PredicateBuilder.New<Partido>();
+
+            if (request.idEquipo.HasValue)
+            {
+                predicado.And(x => x.EquipoLocalId == request.idEquipo || x.EquipoVisitanteId == request.idEquipo);
+            }
+
+            if (request.idTorneo.HasValue)
+            {
+                predicado.And(x => x.TorneoId == request.idTorneo);
+            }
+
+            return predicado;
+        }
+
+        
     }
 }

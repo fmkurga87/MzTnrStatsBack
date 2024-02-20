@@ -15,7 +15,6 @@ namespace MzTNR.Data.Models.TNR
         public virtual Equipo? EquipoVisitante { get; set; }
         public int? EquipoVisitanteId { get; set; }  
         public int GolesVisitante { get; set; }
-        public string? Link { get; set; }
         public DateTime? Fecha { get; set; }
         // Fecha 1, Fecha 2...
         public int FechaNumero { get; set; }

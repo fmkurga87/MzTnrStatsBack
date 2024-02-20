@@ -8,6 +8,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using AutoMapper;
 using LinqKit;
+using Microsoft.EntityFrameworkCore;
 using MzTNR.Contracts.Compartidos;
 using MzTNR.Contracts.Partidos;
 using MzTNR.Contracts.Partidos.DTOs;
@@ -48,9 +49,11 @@ namespace MzTNR.Services.Partidos
 
         public async Task<ObtenerPartidoResponse> ObtenerPartido(ObtenerPartidoRequest request)
         {
+            var partidoXML  = await ObtenerFichaPartidoXML(request.Id);
+
             return new ObtenerPartidoResponse() {
-                Encontrado = true,
-                Partido = await ObtenerFichaPartidoXML(request.Id)
+                Encontrado = partidoXML.Id == 0 ? false : true,
+                Partido = partidoXML
             };
             
         }
@@ -78,6 +81,8 @@ namespace MzTNR.Services.Partidos
                     string typeId = matchElement.Attribute("typeId")?.Value ?? "";
 
                     bool partidoDeTNR = false;
+                    int idMzLocal = 0;
+                    int idMzVisitante = 0;
 
                     if (type == "")
                     {
@@ -108,13 +113,37 @@ namespace MzTNR.Services.Partidos
 
                         if (teamField == "home")
                         {
+                            idMzLocal = Int32.Parse(teamId);
                             resumenPartidoActual.EquipoLocal = teamName;
                             resumenPartidoActual.GolesLocal = Int32.Parse(goals);
                         }
                         else
                         {
+                            idMzVisitante = Int32.Parse(teamId);
                             resumenPartidoActual.EquipoVisitante = teamName;
                             resumenPartidoActual.GolesVisitante = Int32.Parse(goals);
+                        }
+                    }
+
+                    if (partidoDeTNR)
+                    {
+                        if (_applicationDbContext.Partidos.Any(x => x.IdMz == int.Parse(typeId)))
+                        {
+                            // Actualizar resultado (generar nueva fx que solo reciba idpartido y goles) + endpoint!!
+                        }
+                        else
+                        {
+                            var idPartidoNuevo = this.CrearPartido(new CrearPartidoRequest() 
+                            {
+                                IdMz = int.Parse(typeId),
+                                EquipoLocalId = await ObtenerIdEquipo(idMzLocal),
+                                GolesLocal = resumenPartidoActual.GolesLocal,
+                                EquipoVisitanteId = await ObtenerIdEquipo(idMzVisitante),
+                                GolesVisitante = resumenPartidoActual.GolesVisitante,
+                                Fecha = DateTime.Parse(date),
+                                FechaNumero = 0,
+                                TorneoId = int.Parse(typeId),
+                            });
                         }
                     }
 
@@ -134,36 +163,37 @@ namespace MzTNR.Services.Partidos
             string urlXmlPartidos = $"http://www.managerzone.com/xml/match_info.php?sport_id=1&match_id={idPartido}";
             XDocument xmlPartidos = XDocument.Load(urlXmlPartidos);
 
-            // TODO: Parsearlo manualmente, asi falla
-            detallePartidoXML = (from m in xmlPartidos.Descendants("Match")
-                     select new DetallePartidoXML
-                     {
-                         Id = (int)m.Attribute("id"),
-                         Date = DateTime.Parse((string)m.Attribute("date")),
-                         Type = (int)m.Attribute("type"),
-                         Sport = (string)m.Attribute("sport"),
-                         Spectators = (int)m.Attribute("spectators"),
-                         HomeTeam = (from t in m.Elements("Team")
-                                     where (string)t.Attribute("field") == "home"
-                                     select new TeamMatch
-                                     {
-                                         Id = (int)t.Attribute("id"),
-                                         Name = (string)t.Attribute("name"),
-                                         ShortName = (string)t.Attribute("shortname"),
-                                         Country = (string)t.Attribute("country"),
-                                         Field = (string)t.Attribute("field"),
-                                         Goals = (int)t.Attribute("goals"),
-                                         Players = (from p in t.Elements("Player")
+            if (xmlPartidos.Descendants("Match").Any())
+            {
+                detallePartidoXML = (from m in xmlPartidos.Descendants("Match")
+                    select new DetallePartidoXML
+                    {
+                        Id = (int)m.Attribute("id"),
+                        Date = DateTime.Parse((string)m.Attribute("date")),
+                        Type = (int)m.Attribute("type"),
+                        Sport = (string)m.Attribute("sport"),
+                        Spectators = (int)m.Attribute("spectators"),
+                        HomeTeam = (from t in m.Elements("Team")
+                                    where (string)t.Attribute("field") == "home"
+                                    select new TeamMatch
+                                    {
+                                        Id = (int)t.Attribute("id"),
+                                        Name = (string)t.Attribute("name"),
+                                        ShortName = (string)t.Attribute("shortname"),
+                                        Country = (string)t.Attribute("country"),
+                                        Field = (string)t.Attribute("field"),
+                                        Goals = (int)t.Attribute("goals"),
+                                        Players = (from p in t.Elements("Player")
                                                     select new PlayerMatch
                                                     {
                                                         Id = (int)p.Attribute("id"),
                                                         Name = (string)p.Attribute("name"),
                                                         ShirtNumber = (int)p.Attribute("shirtno"),
-                                                        Goals = new Goals
+                                                        Goals = (p.Element("Goals") != null) ? new Goals
                                                         {
                                                             Pro = (int)p.Element("Goals").Attribute("pro"),
                                                             Own = (int)p.Element("Goals").Attribute("own")
-                                                        },
+                                                        } : null,
                                                         Cards = (p.Element("Cards") != null) ? new Cards
                                                         {
                                                             Yellow = (int)p.Element("Cards").Attribute("yellow"),
@@ -172,27 +202,27 @@ namespace MzTNR.Services.Partidos
                                                     }).ToList()
                                      }).FirstOrDefault(),
 
-                         AwayTeam = (from t in m.Elements("Team")
-                                     where (string)t.Attribute("field") == "away"
-                                     select new TeamMatch
-                                     {
-                                         Id = (int)t.Attribute("id"),
-                                         Name = (string)t.Attribute("name"),
-                                         ShortName = (string)t.Attribute("shortname"),
-                                         Country = (string)t.Attribute("country"),
-                                         Field = (string)t.Attribute("field"),
-                                         Goals = (int)t.Attribute("goals"),
-                                         Players = (from p in t.Elements("Player")
+                        AwayTeam = (from t in m.Elements("Team")
+                                    where (string)t.Attribute("field") == "away"
+                                    select new TeamMatch
+                                    {
+                                        Id = (int)t.Attribute("id"),
+                                        Name = (string)t.Attribute("name"),
+                                        ShortName = (string)t.Attribute("shortname"),
+                                        Country = (string)t.Attribute("country"),
+                                        Field = (string)t.Attribute("field"),
+                                        Goals = (int)t.Attribute("goals"),
+                                        Players = (from p in t.Elements("Player")
                                                     select new PlayerMatch
                                                     {
                                                         Id = (int)p.Attribute("id"),
                                                         Name = (string)p.Attribute("name"),
                                                         ShirtNumber = (int)p.Attribute("shirtno"),
-                                                        Goals = new Goals
+                                                        Goals = (p.Element("Goals") != null) ? new Goals
                                                         {
                                                             Pro = (int)p.Element("Goals").Attribute("pro"),
                                                             Own = (int)p.Element("Goals").Attribute("own")
-                                                        },
+                                                        } : null,
                                                         Cards = (p.Element("Cards") != null) ? new Cards
                                                         {
                                                             Yellow = (int)p.Element("Cards").Attribute("yellow"),
@@ -201,46 +231,7 @@ namespace MzTNR.Services.Partidos
                                                     }).ToList()
                                      }).FirstOrDefault()
                      }).FirstOrDefault();
-
-            // Console.WriteLine($"Match ID: {match.Id}");
-            // Console.WriteLine($"Date: {match.Date}");
-            // Console.WriteLine($"Type: {match.Type}");
-            // Console.WriteLine($"Sport: {match.Sport}");
-            // Console.WriteLine($"Spectators: {match.Spectators}");
-            // Console.WriteLine($"Home Team: {match.HomeTeam.Name}");
-            // Console.WriteLine($"Home Team Goals: {match.HomeTeam.Goals}");
-            // Console.WriteLine($"Away Team: {match.AwayTeam.Name}");
-            // Console.WriteLine($"Away Team Goals: {match.AwayTeam.Goals}");
-
-            // Console.WriteLine("\nHome Team Players:");
-            // foreach (var player in match.HomeTeam.Players)
-            // {
-            //     Console.WriteLine($"Player Name: {player.Name}");
-            //     Console.WriteLine($"Shirt Number: {player.ShirtNumber}");
-            //     Console.WriteLine($"Goals Scored: {player.Goals.Pro}");
-            //     Console.WriteLine($"Own Goals: {player.Goals.Own}");
-            //     if (player.Cards != null)
-            //     {
-            //         Console.WriteLine($"Yellow Cards: {player.Cards.Yellow}");
-            //         Console.WriteLine($"Red Cards: {player.Cards.Red}");
-            //     }
-            //     Console.WriteLine();
-            // }
-
-            // Console.WriteLine("\nAway Team Players:");
-            // foreach (var player in match.AwayTeam.Players)
-            // {
-            //     Console.WriteLine($"Player Name: {player.Name}");
-            //     Console.WriteLine($"Shirt Number: {player.ShirtNumber}");
-            //     Console.WriteLine($"Goals Scored: {player.Goals.Pro}");
-            //     Console.WriteLine($"Own Goals: {player.Goals.Own}");
-            //     if (player.Cards != null)
-            //     {
-            //         Console.WriteLine($"Yellow Cards: {player.Cards.Yellow}");
-            //         Console.WriteLine($"Red Cards: {player.Cards.Red}");
-            //     }
-            //     Console.WriteLine();
-            // }
+            }            
 
             return detallePartidoXML;
         }
@@ -262,6 +253,15 @@ namespace MzTNR.Services.Partidos
             return predicado;
         }
 
+        private async Task<int> ObtenerIdEquipo(int IdEquipoMz)
+        {
+            var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.IdMz == IdEquipoMz);
+
+            if (equipo != null)
+                return equipo.Id;
+            else
+                return 0;
+        }
         
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -7,6 +8,7 @@ namespace MzTNR.Contracts.Partidos.RequetResponses
 {
     public class CrearPartidoRequest
     {
+        [Required]
         public int IdMz { get; set; }
         public int? EquipoLocalId { get; set; }  
         public int GolesLocal { get; set; }

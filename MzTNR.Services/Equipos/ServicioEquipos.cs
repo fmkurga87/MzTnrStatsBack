@@ -39,11 +39,23 @@ namespace MzTNR.Services.Equipos
 
         public async Task<CrearEquipoResponse> CrearEquipo(CrearEquipoRequest request)
         {
-            var equipoNuevo = _mapper.Map<Equipo>(request);
-            _applicationDbContext.Equipos.Add(equipoNuevo);
-            var id = await _applicationDbContext.SaveChangesAsync();
+            CrearEquipoResponse crearEquipoResponse = new CrearEquipoResponse();
+
+            #region Validaciones
+            if (_applicationDbContext.Equipos.Any(x => x.IdMz == request.IdMz || x.UsuarioMZ == request.UsuarioMZ))
+            {
+                crearEquipoResponse.AddError("Equipo", "El IdMz y/o el Usuario ya fueron creados");
+            }
+            #endregion
+
+            if (crearEquipoResponse.Errores.Count() == 0)
+            {
+                var equipoNuevo = _mapper.Map<Equipo>(request);
+                _applicationDbContext.Equipos.Add(equipoNuevo);
+                crearEquipoResponse.Id = await _applicationDbContext.SaveChangesAsync();
+            }
             
-            return new CrearEquipoResponse() { Id = id };
+            return crearEquipoResponse;
         }
 
         public async Task<ModificarEquipoResponse> ModificarEquipo(ModificarEquipoRequest request)
@@ -75,7 +87,10 @@ namespace MzTNR.Services.Equipos
         {
             ObtenerEquipoResponse obtenerEquipoResponse = new ObtenerEquipoResponse() { Encontrado = true};
 
-            var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var equipo = await _applicationDbContext.Equipos.Include(x => x.Ciudad)
+                                                            .Include(x => x.Ciudad.Provincia)
+                                                    .FirstOrDefaultAsync(x => x.Id == request.Id);
+                                                            
 
             if (equipo != null)
             {
@@ -86,19 +101,14 @@ namespace MzTNR.Services.Equipos
                     UsuarioMZ = equipo.UsuarioMZ,
                     Nombre = equipo.Nombre,
                     Apellido = equipo.Apellido,
-                    
-                    //TODO: Mostrar solo los nombres (usar ResumenCiudad -> Agregar mapeo)
-                    //Ciudad =
-                    //Provincia = 
-                  
+                    Ciudad = equipo.Ciudad.Nombre,
+                    Provincia = equipo.Ciudad.Provincia.Nombre,
                     UrlEscudo = $"https://www.managerzone.com/dynimg/badge.php?team_id={equipo.IdMz}&sport=soccer",
-                    // TODO: Agregar una fx que reciba id de equipo MZ y si se consultan partidos jugados o proximos, y se obtnega el xml
-                    // Esta Fx deberia estar en ServicioPartidos
                     PartidosJugados = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz.Value, 1),
                     PartidosProximos = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz.Value, 2)
                 };
+
                 obtenerEquipoResponse.Equipo = datosEquipo;
-                
             }
             else
             {

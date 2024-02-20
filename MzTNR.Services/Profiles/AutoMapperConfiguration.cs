@@ -8,6 +8,7 @@ using MzTNR.Contracts.Ciudades.RequestResponses;
 using MzTNR.Contracts.Equipos.Modelos;
 using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Contracts.Partidos.DTOs;
+using MzTNR.Contracts.Partidos.RequetResponses;
 using MzTNR.Contracts.Provincias.DTOs;
 using MzTNR.Contracts.Provincias.RequestResponses;
 using MzTNR.Contracts.Torneos.DTOs;
@@ -32,7 +33,8 @@ namespace MzTNR.Services.Profiles
             #endregion
             
             #region Partidos
-                CreateMap<Partido, PartidoDTO>();    
+            CreateMap<Partido, PartidoDTO>();
+            CreateMap<CrearPartidoRequest, Partido>();
             #endregion
 
             #region Provincias

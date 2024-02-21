@@ -16,6 +16,7 @@ using MzTNR.Contracts.Partidos.Modelos;
 using MzTNR.Contracts.Partidos.RequetResponses;
 using MzTNR.Data.Data;
 using MzTNR.Data.Models.TNR;
+using MzTNR.Services.Extensiones;
 using static MzTNR.Contracts.Partidos.DTOs.DetallePartidoXML;
 using static MzTNR.Contracts.Partidos.DTOs.ListaPartidosXML;
 
@@ -25,21 +26,50 @@ namespace MzTNR.Services.Partidos
     {
         private ApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
+        private readonly MetodosComunes _metodosComunes;
         
         public ServicioPartidos(ApplicationDbContext applicationDbContext, IMapper mapper)
         {
             _mapper = mapper;
             _applicationDbContext = applicationDbContext;
-            
+            _metodosComunes = new MetodosComunes(applicationDbContext);
         }
         public Task<BuscarPartidosResponse> BuscarPartidos(BuscarPartidosRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public Task<CrearPartidoResponse> CrearPartido(CrearPartidoRequest request)
+        public async Task<CrearPartidoResponse> CrearPartido(CrearPartidoRequest request)
         {
-            throw new NotImplementedException();
+            CrearPartidoResponse crearPartidoResponse = new CrearPartidoResponse();
+            
+            #region Validaciones
+            if (_applicationDbContext.Partidos.Any(x => x.IdMz == request.IdMz))
+            {
+                crearPartidoResponse.AddError("Partido", "El partido ya fue creados.");
+            }
+
+            if (request.EquipoLocalId == 0 || request.EquipoVisitanteId == 0)
+            {
+                crearPartidoResponse.AddError("Equipo", "El equipo local y/o el equipo visitante no fue encontrado.");
+            }
+
+            if (request.TorneoId == 0)
+            {
+                crearPartidoResponse.AddError("Torneo", "El torneo no fue encontrado.");
+            }
+            #endregion
+
+            if (crearPartidoResponse.Errores.Count() == 0)
+            {
+                var partidoNuevo = _mapper.Map<Partido>(request);
+                _applicationDbContext.Partidos.Add(partidoNuevo);
+                // TODO: Volver a habilitar
+                //crearPartidoResponse.Id = await _applicationDbContext.SaveChangesAsync();
+            }
+            
+            return crearPartidoResponse;
+
         }
 
         public Task<ModificarPartidoResponse> ModificarPartido(ModificarPartidoRequest request)
@@ -60,7 +90,6 @@ namespace MzTNR.Services.Partidos
 
         public async Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos)
         {
-            // TODO: Agregar la inteligencia para guardar la info de los partidos que correspondan al TNR
             List<ResumenPartido> resumenPartidos = new List<ResumenPartido>();
 
             // Obtengo el XML
@@ -136,13 +165,13 @@ namespace MzTNR.Services.Partidos
                             var idPartidoNuevo = this.CrearPartido(new CrearPartidoRequest() 
                             {
                                 IdMz = int.Parse(typeId),
-                                EquipoLocalId = await ObtenerIdEquipo(idMzLocal),
+                                EquipoLocalId = await _metodosComunes.ObtenerIdEquipo(idMzLocal),
                                 GolesLocal = resumenPartidoActual.GolesLocal,
-                                EquipoVisitanteId = await ObtenerIdEquipo(idMzVisitante),
+                                EquipoVisitanteId = await _metodosComunes.ObtenerIdEquipo(idMzVisitante),
                                 GolesVisitante = resumenPartidoActual.GolesVisitante,
                                 Fecha = DateTime.Parse(date),
                                 FechaNumero = 0,
-                                TorneoId = int.Parse(typeId),
+                                TorneoId = await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
                             });
                         }
                     }
@@ -251,16 +280,6 @@ namespace MzTNR.Services.Partidos
             }
 
             return predicado;
-        }
-
-        private async Task<int> ObtenerIdEquipo(int IdEquipoMz)
-        {
-            var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.IdMz == IdEquipoMz);
-
-            if (equipo != null)
-                return equipo.Id;
-            else
-                return 0;
         }
         
     }

@@ -28,7 +28,6 @@ namespace MzTNR.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] CrearCiudadRequest crearCiudadRequest)
         {
-            // TODO: Validar request
             var crearCiudadResponse = await _servicioCiudades.CrearCiudad(crearCiudadRequest);
 
             return Ok(crearCiudadResponse);
@@ -37,7 +36,6 @@ namespace MzTNR.Web.Controllers
         [HttpPut]
         public async Task<ActionResult> Put([FromBody] ModificarCiudadRequest modificarCiudadRequest)
         {
-            // TODO: Validar request
             var modificarCiudadResponse = await _servicioCiudades.ModificarCiudad(modificarCiudadRequest);
 
             return Ok(modificarCiudadResponse);

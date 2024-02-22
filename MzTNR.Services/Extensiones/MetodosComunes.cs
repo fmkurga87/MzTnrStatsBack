@@ -1,18 +1,24 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MzTNR.Contracts.Equipos;
+using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Data.Data;
 
 namespace MzTNR.Services.Extensiones
 {
-    internal class MetodosComunes
+    public class MetodosComunes
     {
         private ApplicationDbContext _applicationDbContext;
-        internal MetodosComunes(ApplicationDbContext applicationDbContext)
+        private readonly IServicioEquipos _servicioEquipos;
+
+        internal MetodosComunes(ApplicationDbContext applicationDbContext, IServicioEquipos servicioEquipos)
         {
             _applicationDbContext = applicationDbContext;
+            _servicioEquipos = servicioEquipos;
         } 
 
         internal async Task<int> ObtenerIdEquipo(int IdEquipoMz)
@@ -33,6 +39,22 @@ namespace MzTNR.Services.Extensiones
                 return torneo.Id;
             else
                 return 0;
+        }
+
+        internal async Task<int> ValidarEquipo(int IdEquipoMz, string NombreEquipo)
+        {
+            var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.IdMz == IdEquipoMz);
+
+            if (equipo == null)
+            {
+                var crearEquipoResponse = await _servicioEquipos.CrearEquipo(new CrearEquipoRequest() { IdMz = IdEquipoMz , NombreEquipo = NombreEquipo});
+                // TODO: Validar errores
+                return crearEquipoResponse.Id;
+            }
+            else
+            {
+                return equipo.Id;
+            }
         }
     }
 }

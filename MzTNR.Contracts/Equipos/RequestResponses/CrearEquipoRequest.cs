@@ -8,10 +8,10 @@ namespace MzTNR.Contracts.Equipos.RequestResponses
 {
     public class CrearEquipoRequest
     {
+        [Required]
         public string? NombreEquipo { get; set; }
         [Required]
         public int? IdMz { get; set; }
-        [Required]
         public string? UsuarioMZ { get; set; }
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }

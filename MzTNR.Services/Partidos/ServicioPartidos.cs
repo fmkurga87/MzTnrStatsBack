@@ -9,7 +9,9 @@ using System.Xml.Serialization;
 using AutoMapper;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MzTNR.Contracts.Compartidos;
+using MzTNR.Contracts.Equipos;
 using MzTNR.Contracts.Partidos;
 using MzTNR.Contracts.Partidos.DTOs;
 using MzTNR.Contracts.Partidos.Modelos;
@@ -26,13 +28,15 @@ namespace MzTNR.Services.Partidos
     {
         private ApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
-        private readonly MetodosComunes _metodosComunes;
+
+        // TODO: Ver como inyectar/instanciar esto
+        //private readonly MetodosComunes _metodosComunes;
         
         public ServicioPartidos(ApplicationDbContext applicationDbContext, IMapper mapper)
         {
             _mapper = mapper;
             _applicationDbContext = applicationDbContext;
-            _metodosComunes = new MetodosComunes(applicationDbContext);
+            // = new MetodosComunes(_applicationDbContext);
         }
         public Task<BuscarPartidosResponse> BuscarPartidos(BuscarPartidosRequest request)
         {
@@ -110,8 +114,8 @@ namespace MzTNR.Services.Partidos
                     string typeId = matchElement.Attribute("typeId")?.Value ?? "";
 
                     bool partidoDeTNR = false;
-                    int idMzLocal = 0;
-                    int idMzVisitante = 0;
+                    int idLocal = 0;
+                    int idVisitante = 0;
 
                     if (type == "")
                     {
@@ -142,13 +146,13 @@ namespace MzTNR.Services.Partidos
 
                         if (teamField == "home")
                         {
-                            idMzLocal = Int32.Parse(teamId);
+                            idLocal = 1; //await _metodosComunes.ValidarEquipo(Int32.Parse(teamId), teamName);
                             resumenPartidoActual.EquipoLocal = teamName;
                             resumenPartidoActual.GolesLocal = Int32.Parse(goals);
                         }
                         else
                         {
-                            idMzVisitante = Int32.Parse(teamId);
+                            idVisitante = 1; //await _metodosComunes.ValidarEquipo(Int32.Parse(teamId), teamName);
                             resumenPartidoActual.EquipoVisitante = teamName;
                             resumenPartidoActual.GolesVisitante = Int32.Parse(goals);
                         }
@@ -165,13 +169,13 @@ namespace MzTNR.Services.Partidos
                             var idPartidoNuevo = this.CrearPartido(new CrearPartidoRequest() 
                             {
                                 IdMz = int.Parse(typeId),
-                                EquipoLocalId = await _metodosComunes.ObtenerIdEquipo(idMzLocal),
+                                EquipoLocalId = idLocal,
                                 GolesLocal = resumenPartidoActual.GolesLocal,
-                                EquipoVisitanteId = await _metodosComunes.ObtenerIdEquipo(idMzVisitante),
+                                EquipoVisitanteId = idVisitante,
                                 GolesVisitante = resumenPartidoActual.GolesVisitante,
                                 Fecha = DateTime.Parse(date),
                                 FechaNumero = 0,
-                                TorneoId = await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
+                                TorneoId = 1, //await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
                             });
                         }
                     }

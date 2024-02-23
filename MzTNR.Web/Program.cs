@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MzTNR.Contracts.Ciudades;
+using MzTNR.Contracts.Compartidos;
 using MzTNR.Contracts.Equipos;
 using MzTNR.Contracts.Partidos;
 using MzTNR.Contracts.Provincias;

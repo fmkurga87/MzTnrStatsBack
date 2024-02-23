@@ -4,21 +4,22 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MzTNR.Contracts.Compartidos;
 using MzTNR.Contracts.Equipos;
 using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Data.Data;
+using MzTNR.Data.Models.TNR;
 
 namespace MzTNR.Services.Extensiones
 {
-    public class MetodosComunes
+    internal class MetodosComunes
     {
         private ApplicationDbContext _applicationDbContext;
         private readonly IServicioEquipos _servicioEquipos;
 
-        internal MetodosComunes(ApplicationDbContext applicationDbContext, IServicioEquipos servicioEquipos)
+        internal MetodosComunes(ApplicationDbContext applicationDbContext)
         {
             _applicationDbContext = applicationDbContext;
-            _servicioEquipos = servicioEquipos;
         } 
 
         internal async Task<int> ObtenerIdEquipo(int IdEquipoMz)
@@ -47,9 +48,10 @@ namespace MzTNR.Services.Extensiones
 
             if (equipo == null)
             {
-                var crearEquipoResponse = await _servicioEquipos.CrearEquipo(new CrearEquipoRequest() { IdMz = IdEquipoMz , NombreEquipo = NombreEquipo});
-                // TODO: Validar errores
-                return crearEquipoResponse.Id;
+                // TODO: Ver  si esto se puede hacer llamando al servicioEquipos son que haya loop con la DI.
+                _applicationDbContext.Equipos.Add(new Equipo() {IdMz = IdEquipoMz, NombreEquipo = NombreEquipo});
+
+                return await _applicationDbContext.SaveChangesAsync();
             }
             else
             {

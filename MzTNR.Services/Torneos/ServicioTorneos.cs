@@ -48,7 +48,7 @@ namespace MzTNR.Services.Torneos
         {
             ObtenerTorneoResponse obtenerTorneoResponse = new ObtenerTorneoResponse() {Encontrado = true};
 
-            var torneo = await _applicationDbContext.Torneos.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var torneo = await _applicationDbContext.Torneos.FirstOrDefaultAsync(x => x.IdMz == request.Id);
 
             if (torneo == null)
             {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MzTNR.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InicialConIdMz : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -70,13 +70,29 @@ namespace MzTNR.Data.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Estadisticas",
+                columns: table => new
+                {
+                    Clave = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Visitas = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Estadisticas", x => x.Clave);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Provincias",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Nombre = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Codigo = table.Column<int>(type: "int", nullable: false),
+                    Borrado = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,8 +104,9 @@ namespace MzTNR.Data.Migrations
                 name: "Torneos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    IdMz = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Tipo = table.Column<int>(type: "int", nullable: false),
                     Nombre = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Edicion = table.Column<int>(type: "int", nullable: false),
@@ -97,12 +114,11 @@ namespace MzTNR.Data.Migrations
                     FechaInicio = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     FechaFin = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     Link = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Tipo = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Torneos", x => x.Id);
+                    table.PrimaryKey("PK_Torneos", x => x.IdMz);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -239,6 +255,7 @@ namespace MzTNR.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CoordenadaY = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Borrado = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ProvinciaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -272,7 +289,7 @@ namespace MzTNR.Data.Migrations
                         name: "FK_Imagen_Torneos_TorneoId",
                         column: x => x.TorneoId,
                         principalTable: "Torneos",
-                        principalColumn: "Id",
+                        principalColumn: "IdMz",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -284,16 +301,16 @@ namespace MzTNR.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Instancia = table.Column<int>(type: "int", nullable: false),
-                    TorneoId = table.Column<int>(type: "int", nullable: true)
+                    TorneoIdMz = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Playoffs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Playoffs_Torneos_TorneoId",
-                        column: x => x.TorneoId,
+                        name: "FK_Playoffs_Torneos_TorneoIdMz",
+                        column: x => x.TorneoIdMz,
                         principalTable: "Torneos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -301,7 +318,7 @@ namespace MzTNR.Data.Migrations
                 name: "Equipos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    IdMz = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     NombreEquipo = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -311,11 +328,12 @@ namespace MzTNR.Data.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Apellido = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Borrado = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CiudadId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Equipos", x => x.Id);
+                    table.PrimaryKey("PK_Equipos", x => x.IdMz);
                     table.ForeignKey(
                         name: "FK_Equipos_Ciudades_CiudadId",
                         column: x => x.CiudadId,
@@ -347,12 +365,12 @@ namespace MzTNR.Data.Migrations
                         name: "FK_FasesGrupos_Equipos_EquipoId",
                         column: x => x.EquipoId,
                         principalTable: "Equipos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                     table.ForeignKey(
                         name: "FK_FasesGrupos_Torneos_TorneoId",
                         column: x => x.TorneoId,
                         principalTable: "Torneos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -360,7 +378,7 @@ namespace MzTNR.Data.Migrations
                 name: "LigasAmistosas",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    IdMz = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     TorneoId = table.Column<int>(type: "int", nullable: true),
                     Posicion = table.Column<int>(type: "int", nullable: false),
@@ -373,17 +391,17 @@ namespace MzTNR.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LigasAmistosas", x => x.Id);
+                    table.PrimaryKey("PK_LigasAmistosas", x => x.IdMz);
                     table.ForeignKey(
                         name: "FK_LigasAmistosas_Equipos_EquipoId",
                         column: x => x.EquipoId,
                         principalTable: "Equipos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                     table.ForeignKey(
                         name: "FK_LigasAmistosas_Torneos_TorneoId",
                         column: x => x.TorneoId,
                         principalTable: "Torneos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -391,36 +409,34 @@ namespace MzTNR.Data.Migrations
                 name: "Partidos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    IdMz = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     EquipoLocalId = table.Column<int>(type: "int", nullable: true),
                     GolesLocal = table.Column<int>(type: "int", nullable: false),
                     EquipoVisitanteId = table.Column<int>(type: "int", nullable: true),
                     GolesVisitante = table.Column<int>(type: "int", nullable: false),
-                    Link = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Fecha = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     FechaNumero = table.Column<int>(type: "int", nullable: false),
                     TorneoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Partidos", x => x.Id);
+                    table.PrimaryKey("PK_Partidos", x => x.IdMz);
                     table.ForeignKey(
                         name: "FK_Partidos_Equipos_EquipoLocalId",
                         column: x => x.EquipoLocalId,
                         principalTable: "Equipos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                     table.ForeignKey(
                         name: "FK_Partidos_Equipos_EquipoVisitanteId",
                         column: x => x.EquipoVisitanteId,
                         principalTable: "Equipos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                     table.ForeignKey(
                         name: "FK_Partidos_Torneos_TorneoId",
                         column: x => x.TorneoId,
                         principalTable: "Torneos",
-                        principalColumn: "Id");
+                        principalColumn: "IdMz");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -515,9 +531,9 @@ namespace MzTNR.Data.Migrations
                 column: "TorneoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Playoffs_TorneoId",
+                name: "IX_Playoffs_TorneoIdMz",
                 table: "Playoffs",
-                column: "TorneoId");
+                column: "TorneoIdMz");
         }
 
         /// <inheritdoc />
@@ -537,6 +553,9 @@ namespace MzTNR.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Estadisticas");
 
             migrationBuilder.DropTable(
                 name: "FasesGrupos");

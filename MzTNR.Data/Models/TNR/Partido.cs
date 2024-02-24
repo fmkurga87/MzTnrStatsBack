@@ -7,7 +7,7 @@ namespace MzTNR.Data.Models.TNR
 {
     public class Partido
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public int IdMz { get; set; }
         public virtual Equipo? EquipoLocal { get; set; }
         public int? EquipoLocalId { get; set; }  

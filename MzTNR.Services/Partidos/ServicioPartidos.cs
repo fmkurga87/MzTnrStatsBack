@@ -125,7 +125,7 @@ namespace MzTNR.Services.Partidos
                         // Verificamos si pertenece al TNR
                         if (type != "friendly")
                         {
-                            partidoDeTNR = _applicationDbContext.Torneos.Any(x => x.IdMz == int.Parse(typeId));
+                            partidoDeTNR = await _applicationDbContext.Torneos.AnyAsync(x => x.IdMz == int.Parse(typeId));
                         }
                                                 
                         resumenPartidoActual.TipoPartido = Enum.Parse<EnumTipoPartidoEng>(type);
@@ -172,7 +172,7 @@ namespace MzTNR.Services.Partidos
                                 GolesVisitante = resumenPartidoActual.GolesVisitante,
                                 Fecha = DateTime.Parse(date),
                                 FechaNumero = 0,
-                                TorneoId = await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
+                                TorneoId = int.Parse(typeId) // await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
                             });
                         }
                     }

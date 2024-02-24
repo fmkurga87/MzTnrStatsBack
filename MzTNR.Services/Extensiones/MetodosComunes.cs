@@ -22,7 +22,7 @@ namespace MzTNR.Services.Extensiones
             _applicationDbContext = applicationDbContext;
         } 
 
-        internal async Task<int> ObtenerIdEquipo(int IdEquipoMz)
+        /*internal async Task<int> ObtenerIdEquipo(int IdEquipoMz)
         {
             var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.IdMz == IdEquipoMz);
 
@@ -41,21 +41,21 @@ namespace MzTNR.Services.Extensiones
             else
                 return 0;
         }
-
+        */
         internal async Task<int> ValidarEquipo(int IdEquipoMz, string NombreEquipo)
         {
             var equipo = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.IdMz == IdEquipoMz);
 
             if (equipo == null)
             {
-                // TODO: Ver  si esto se puede hacer llamando al servicioEquipos son que haya loop con la DI.
+                // TODO: Ver  si esto se puede hacer llamando al servicioEquipos sin que haya loop con la DI.
                 _applicationDbContext.Equipos.Add(new Equipo() {IdMz = IdEquipoMz, NombreEquipo = NombreEquipo});
 
                 return await _applicationDbContext.SaveChangesAsync();
             }
             else
             {
-                return equipo.Id;
+                return equipo.IdMz;
             }
         }
     }

@@ -62,7 +62,7 @@ namespace MzTNR.Services.Equipos
         {
             ModificarEquipoResponse response = new ModificarEquipoResponse();
 
-            var equipoAModificar = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var equipoAModificar = await _applicationDbContext.Equipos.FirstOrDefaultAsync(x => x.IdMz == request.Id);
 
             if (equipoAModificar != null)
             {
@@ -89,7 +89,7 @@ namespace MzTNR.Services.Equipos
 
             var equipo = await _applicationDbContext.Equipos.Include(x => x.Ciudad)
                                                             .Include(x => x.Ciudad.Provincia)
-                                                    .FirstOrDefaultAsync(x => x.Id == request.Id);
+                                                    .FirstOrDefaultAsync(x => x.IdMz == request.Id);
                                                             
 
             if (equipo != null)
@@ -104,8 +104,8 @@ namespace MzTNR.Services.Equipos
                     Ciudad = equipo.Ciudad.Nombre,
                     Provincia = equipo.Ciudad.Provincia.Nombre,
                     UrlEscudo = $"https://www.managerzone.com/dynimg/badge.php?team_id={equipo.IdMz}&sport=soccer",
-                    PartidosJugados = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz.Value, 1),
-                    PartidosProximos = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz.Value, 2)
+                    PartidosJugados = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz, 1),
+                    PartidosProximos = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz, 2)
                 };
 
                 obtenerEquipoResponse.Equipo = datosEquipo;

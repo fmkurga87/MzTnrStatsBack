@@ -31,6 +31,22 @@ namespace MzTNR.Data.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            //++ PKs basados en IdMz
+            builder.Entity<Equipo>()
+                .HasKey(x => x.IdMz);
+
+            builder.Entity<Partido>()
+                .HasKey(x => x.IdMz);
+
+            builder.Entity<LigaAmistosa>()
+                .HasKey(x => x.IdMz);
+
+            builder.Entity<Torneo>()
+                .HasKey(x => x.IdMz);
+                //.HasKey(x => new {x.Tipo, x.IdMz});
+
+            //--
             
             //++ Relacion Users <<--->> Roles
             builder.Entity<AppUser>()

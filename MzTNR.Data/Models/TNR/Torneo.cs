@@ -7,7 +7,7 @@ namespace MzTNR.Data.Models.TNR
 {
     public class Torneo
     {
-        public int Id { get; set; }
+        public int Tipo { get; set; }
         public int IdMz { get; set; }
         public string? Nombre { get; set; }
         public int Edicion { get; set; }
@@ -15,8 +15,7 @@ namespace MzTNR.Data.Models.TNR
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaFin { get; set; }
         public string? Link { get; set; }
-        public int Tipo { get; set; }
-
+        
         // Relaciones uno a uno
         public LigaAmistosa? LigasAmistosas { get; set; }
         public FaseGrupo? FasesGrupos { get; set; }

@@ -240,7 +240,7 @@ namespace MzTNR.Data.Migrations
 
             modelBuilder.Entity("MzTNR.Data.Models.TNR.Equipo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdMz")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -253,9 +253,6 @@ namespace MzTNR.Data.Migrations
                     b.Property<int?>("CiudadId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IdMz")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nombre")
                         .HasColumnType("longtext");
 
@@ -265,7 +262,7 @@ namespace MzTNR.Data.Migrations
                     b.Property<string>("UsuarioMZ")
                         .HasColumnType("longtext");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdMz");
 
                     b.HasIndex("CiudadId");
 
@@ -356,7 +353,7 @@ namespace MzTNR.Data.Migrations
 
             modelBuilder.Entity("MzTNR.Data.Models.TNR.LigaAmistosa", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdMz")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -384,7 +381,7 @@ namespace MzTNR.Data.Migrations
                     b.Property<int?>("TorneoId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdMz");
 
                     b.HasIndex("EquipoId");
 
@@ -396,7 +393,7 @@ namespace MzTNR.Data.Migrations
 
             modelBuilder.Entity("MzTNR.Data.Models.TNR.Partido", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdMz")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -418,13 +415,10 @@ namespace MzTNR.Data.Migrations
                     b.Property<int>("GolesVisitante")
                         .HasColumnType("int");
 
-                    b.Property<int>("IdMz")
-                        .HasColumnType("int");
-
                     b.Property<int?>("TorneoId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdMz");
 
                     b.HasIndex("EquipoLocalId");
 
@@ -444,12 +438,12 @@ namespace MzTNR.Data.Migrations
                     b.Property<int>("Instancia")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TorneoId")
+                    b.Property<int?>("TorneoIdMz")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TorneoId");
+                    b.HasIndex("TorneoIdMz");
 
                     b.ToTable("Playoffs");
                 });
@@ -476,7 +470,7 @@ namespace MzTNR.Data.Migrations
 
             modelBuilder.Entity("MzTNR.Data.Models.TNR.Torneo", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("IdMz")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -488,9 +482,6 @@ namespace MzTNR.Data.Migrations
 
                     b.Property<DateTime?>("FechaInicio")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<int>("IdMz")
-                        .HasColumnType("int");
 
                     b.Property<string>("Link")
                         .HasColumnType("longtext");
@@ -504,7 +495,7 @@ namespace MzTNR.Data.Migrations
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("IdMz");
 
                     b.ToTable("Torneos");
                 });
@@ -648,7 +639,7 @@ namespace MzTNR.Data.Migrations
                 {
                     b.HasOne("MzTNR.Data.Models.TNR.Torneo", null)
                         .WithMany("Playoffs")
-                        .HasForeignKey("TorneoId");
+                        .HasForeignKey("TorneoIdMz");
                 });
 
             modelBuilder.Entity("MzTNR.Data.Models.Identity.AppRole", b =>

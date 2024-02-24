@@ -50,8 +50,9 @@ namespace MzTNR.Services.Extensiones
             {
                 // TODO: Ver  si esto se puede hacer llamando al servicioEquipos sin que haya loop con la DI.
                 _applicationDbContext.Equipos.Add(new Equipo() {IdMz = IdEquipoMz, NombreEquipo = NombreEquipo});
+                await _applicationDbContext.SaveChangesAsync();
 
-                return await _applicationDbContext.SaveChangesAsync();
+                return IdEquipoMz;
             }
             else
             {

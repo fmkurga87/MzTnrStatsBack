@@ -163,7 +163,7 @@ namespace MzTNR.Services.Partidos
                         }
                         else
                         {
-                            var idPartidoNuevo = this.CrearPartido(new CrearPartidoRequest() 
+                            var idPartidoNuevo = await this.CrearPartido(new CrearPartidoRequest() 
                             {
                                 IdMz = int.Parse(id),
                                 EquipoLocalId = idLocal,

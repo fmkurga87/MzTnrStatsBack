@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MzTNR.Contracts.Partidos.RequetResponses;
 using MzTNR.Contracts.Provincias.RequestResponses;
 
 namespace MzTNR.Contracts.Provincias

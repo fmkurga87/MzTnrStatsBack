@@ -42,6 +42,15 @@ namespace MzTNR.Web.Controllers
             return Ok(modificarPartidoResponse);
         }
 
+        [HttpPut]
+        [Route("Resultado")]
+        public async Task<ActionResult> Put([FromBody] CargarResultadoRequest cargarResultadoRequest)
+        {
+            var modificarPartidoResponse = await _servicioPartidos.CargarResultado(cargarResultadoRequest);
+
+            return Ok(modificarPartidoResponse);
+        }
+        
         [HttpGet]
         [Route("{Id}")]
         public async Task<ActionResult> Get([FromRoute] ObtenerPartidoRequest obtenerPartidoRequest)

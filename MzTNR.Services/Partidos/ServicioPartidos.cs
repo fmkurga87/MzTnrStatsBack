@@ -89,6 +89,28 @@ namespace MzTNR.Services.Partidos
             
         }
 
+        public async Task<CargarResultadoResponse> CargarResultado(CargarResultadoRequest request)
+        {
+            CargarResultadoResponse cargarResultadoResponse = new CargarResultadoResponse (){ Encontrado = true };
+
+            var partido = _applicationDbContext.Partidos.FirstOrDefault(x => x.IdMz == request.IdPartido);
+
+            if (partido != null)
+            {
+                partido.GolesLocal = request.GolesLocal;
+                partido.GolesVisitante = request.GolesVisitante;
+
+                await _applicationDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                cargarResultadoResponse.Encontrado = false;
+                cargarResultadoResponse.AddError("Partido", $"Partido con Id {request.IdPartido} no encontrado");
+            }
+
+            return cargarResultadoResponse;
+        }
+
         public async Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos)
         {
             List<ResumenPartido> resumenPartidos = new List<ResumenPartido>();
@@ -157,24 +179,7 @@ namespace MzTNR.Services.Partidos
 
                     if (partidoDeTNR)
                     {
-                        if (await _applicationDbContext.Partidos.AnyAsync(x => x.IdMz == int.Parse(id)))
-                        {
-                            // Actualizar resultado (generar nueva fx que solo reciba idpartido y goles) + endpoint!!
-                        }
-                        else
-                        {
-                            var idPartidoNuevo = await this.CrearPartido(new CrearPartidoRequest() 
-                            {
-                                IdMz = int.Parse(id),
-                                EquipoLocalId = idLocal,
-                                GolesLocal = resumenPartidoActual.GolesLocal,
-                                EquipoVisitanteId = idVisitante,
-                                GolesVisitante = resumenPartidoActual.GolesVisitante,
-                                Fecha = DateTime.Parse(date),
-                                FechaNumero = 0,
-                                TorneoId = int.Parse(typeId) // await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
-                            });
-                        }
+                        this.AlmacenarPartido(int.Parse(id), idLocal, resumenPartidoActual.GolesLocal, idVisitante, resumenPartidoActual.GolesVisitante, DateTime.Parse(date), int.Parse(typeId));
                     }
 
                     resumenPartidos.Add(resumenPartidoActual);
@@ -281,6 +286,37 @@ namespace MzTNR.Services.Partidos
             }
 
             return predicado;
-        }        
+        }
+
+        private async void AlmacenarPartido(int idPartido, int idLocal, int golesLocal, int idVisitante, int golesVisitante, DateTime fecha, int torneoId)
+        {
+            if (await _applicationDbContext.Partidos.AnyAsync(x => x.IdMz == idPartido))
+            {
+                await this.CargarResultado(new CargarResultadoRequest() 
+                {
+                    IdPartido = idPartido,
+                    GolesLocal = golesLocal,
+                    GolesVisitante = golesVisitante,
+                });
+            }
+            else
+            {
+                await this.CrearPartido(new CrearPartidoRequest() 
+                {
+                    IdMz = idPartido,
+                    EquipoLocalId = idLocal,
+                    GolesLocal = golesLocal,
+                    EquipoVisitanteId = idVisitante,
+                    GolesVisitante = golesVisitante,
+                    Fecha = fecha,
+                    FechaNumero = 0,
+                    TorneoId = torneoId // await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
+                });
+            }
+            
+            return;
+        }
+
+        
     }
 }

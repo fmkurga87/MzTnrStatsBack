@@ -20,5 +20,6 @@ namespace MzTNR.Contracts.Partidos
         /// <param name="tipoPartidos"></param>
         /// <returns></returns>
         Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos);
+        Task<CargarResultadoResponse> CargarResultado(CargarResultadoRequest request);
     }
 }

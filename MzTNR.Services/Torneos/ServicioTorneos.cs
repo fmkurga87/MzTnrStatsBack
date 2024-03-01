@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AutoMapper;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using MzTNR.Contracts.Torneos;
 using MzTNR.Contracts.Torneos.DTOs;
@@ -11,6 +13,7 @@ using MzTNR.Contracts.Torneos.Modelos;
 using MzTNR.Contracts.Torneos.RequestResponses;
 using MzTNR.Data.Data;
 using MzTNR.Data.Models.TNR;
+using MzTNR.Services.Extensiones;
 
 namespace MzTNR.Services.Torneos
 {
@@ -25,9 +28,11 @@ namespace MzTNR.Services.Torneos
             _applicationDbContext = applicationDbContext;
             
         }
-        public Task<BuscarTorneosResponse> BuscarTorneos(BuscarTorneosRequest request)
+        public async Task<BuscarTorneosResponse> BuscarTorneos(BuscarTorneosRequest request)
         {
-            throw new NotImplementedException();
+            var torneos = _applicationDbContext.Torneos.Where(ObtenerPredicadoTorneos(request)).Paginate(request);
+
+            return new BuscarTorneosResponse(request){ Elementos = _mapper.Map<List<TorneoDTO>>(torneos)};
         }
 
         public async Task<CrearTorneoResponse> CrearTorneo(CrearTorneoRequest request)
@@ -70,6 +75,50 @@ namespace MzTNR.Services.Torneos
             }
 
             return obtenerTorneoResponse;
+        }
+
+        private static Expression<Func<Torneo, bool>> ObtenerPredicadoTorneos(BuscarTorneosRequest request)
+        {
+            var predicado = PredicateBuilder.New<Torneo>();
+
+          /*  
+        public int? Edicion { get; set; }
+        public int? TemporadaMZ { get; set; }
+        public int? IdEquipo { get; set; }
+        public DateTime? Fecha { get; set; }*/
+
+            if (request.IdMz.HasValue)
+            {
+                predicado.And(x => x.IdMz == request.IdMz.Value);
+            }
+
+            if (!String.IsNullOrEmpty(request.Nombre))
+            {
+                predicado.And(x => x.Nombre.Contains(request.Nombre));
+            }
+
+            if (request.Edicion.HasValue)
+            {
+                predicado.And(x => x.Edicion == request.Edicion.Value);
+            }
+
+            if (request.TemporadaMZ.HasValue)
+            {
+                predicado.And(x => x.TemporadaMZ == request.TemporadaMZ.Value);
+            }
+
+            if (request.IdEquipo.HasValue)
+            {
+                // TODO: Hacer un navigation para encontrar los torneos del equipo
+                //predicado.And(x => x.IdMz == request.IdMz.Value);
+            }
+
+            if (request.Fecha.HasValue)
+            {
+                predicado.And(x => x.FechaInicio.Value.AddDays(-7) <= request.Fecha.Value && request.Fecha.Value <= x.FechaFin.Value.AddDays(10));
+            }
+
+            return predicado;
         }
 
         private List<PosicionLigaAmistosa> ObtenerDatosLA(int idMzLA)

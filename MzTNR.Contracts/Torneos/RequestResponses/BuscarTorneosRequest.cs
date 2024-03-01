@@ -8,10 +8,11 @@ namespace MzTNR.Contracts.Torneos.RequestResponses
 {
     public class BuscarTorneosRequest : BusquedaPaginadaRequest
     {
-        public int IdMz { get; set; }
+        public int? IdMz { get; set; }
         public string? Nombre { get; set; }
-        public int Edicion { get; set; }
-        public int TemporadaMZ { get; set; }
-        public int IdEquipo { get; set; }
+        public int? Edicion { get; set; }
+        public int? TemporadaMZ { get; set; }
+        public int? IdEquipo { get; set; }
+        public DateTime? Fecha { get; set; }
     }
 }

@@ -81,12 +81,6 @@ namespace MzTNR.Services.Torneos
         {
             var predicado = PredicateBuilder.New<Torneo>();
 
-          /*  
-        public int? Edicion { get; set; }
-        public int? TemporadaMZ { get; set; }
-        public int? IdEquipo { get; set; }
-        public DateTime? Fecha { get; set; }*/
-
             if (request.IdMz.HasValue)
             {
                 predicado.And(x => x.IdMz == request.IdMz.Value);

@@ -47,6 +47,7 @@ namespace MzTNR.Services.Profiles
             #endregion
 
             #region Torneos
+                // TODO: Agregar mapeo a la URL de imagen del torneo
                 CreateMap<Torneo, TorneoDTO>();
                 CreateMap<Torneo, TorneoCompleto>();
                 CreateMap<CrearTorneoRequest, Torneo>();

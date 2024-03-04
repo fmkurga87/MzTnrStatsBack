@@ -14,6 +14,9 @@ using MzTNR.Services.Profiles;
 using MzTNR.Services.Provincias;
 using MzTNR.Services.Torneos;
 
+//CORS
+var MyAllowSpecificationOrigins = "_myAllowSpecificationOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -28,7 +31,14 @@ builder.Services.AddScoped<IServicioEquipos, ServicioEquipos>();
 builder.Services.AddScoped<IServicioPartidos, ServicioPartidos>();
 builder.Services.AddScoped<IServicioTorneos, ServicioTorneos>();
 
+builder.Services.AddCors(options => {
+    options.AddPolicy(name: MyAllowSpecificationOrigins,
+    policy => policy.AllowAnyHeader()
+        .AllowAnyMethod().AllowAnyOrigin());
+});
+
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -45,6 +55,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseCors(MyAllowSpecificationOrigins);
 
 app.UseAuthorization();
 

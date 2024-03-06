@@ -60,5 +60,14 @@ namespace MzTNR.Web.Controllers
 
             return Ok(obtenerTorneoResponse);
         }
+
+        [HttpGet]
+        [Route("/Mock/{cant}")]
+        public async Task<ActionResult> Get([FromRoute] int cant)
+        {
+            var obtenerTorneoResponse = await _servicioTorneos.BuscarTorneosMock(cant);
+
+            return Ok(obtenerTorneoResponse);
+        }
     }
 }

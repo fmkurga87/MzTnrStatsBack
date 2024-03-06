@@ -35,6 +35,18 @@ namespace MzTNR.Services.Torneos
             return new BuscarTorneosResponse(request){ Elementos = _mapper.Map<List<TorneoDTO>>(torneos)};
         }
 
+        public async Task<BuscarTorneosResponse> BuscarTorneosMock(int cant)
+        {
+            BuscarTorneosRequest requestFalso = new BuscarTorneosRequest() {
+                CantidadPagina = cant,
+                NumeroPagina = 1,
+            };
+            
+            var torneos = _applicationDbContext.Torneos.OrderByDescending(x => x.FechaInicio).Paginate(requestFalso);
+
+            return new BuscarTorneosResponse(requestFalso){ Elementos = _mapper.Map<List<TorneoDTO>>(torneos)};
+        }
+
         public async Task<CrearTorneoResponse> CrearTorneo(CrearTorneoRequest request)
         {
             var torneoNuevo = _mapper.Map<Torneo>(request);

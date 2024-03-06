@@ -33,8 +33,9 @@ builder.Services.AddScoped<IServicioTorneos, ServicioTorneos>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy(name: MyAllowSpecificationOrigins,
-    policy => policy.AllowAnyHeader()
-        .AllowAnyMethod().AllowAnyOrigin());
+    policy => policy.AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 });
 
 builder.Services.AddControllers();

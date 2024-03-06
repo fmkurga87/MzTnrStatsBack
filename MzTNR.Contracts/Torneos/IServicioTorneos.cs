@@ -12,5 +12,6 @@ namespace MzTNR.Contracts.Torneos
         Task<CrearTorneoResponse> CrearTorneo(CrearTorneoRequest request);
         Task<ModificarTorneoResponse> ModificarTorneo(ModificarTorneoRequest request);
         Task<ObtenerTorneoResponse> ObtenerTorneo(ObtenerTorneoRequest request);
+        Task<BuscarTorneosResponse> BuscarTorneosMock(int cant);
     }
 }

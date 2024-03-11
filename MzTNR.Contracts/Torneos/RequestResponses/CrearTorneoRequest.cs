@@ -15,6 +15,8 @@ namespace MzTNR.Contracts.Torneos.RequestResponses
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaFin { get; set; }
         public string? Link { get; set; }
+        public int? IdCampeon { get; set; }
+        public string? UrlImagen { get; set; }
         public EnumTipoTorneo Tipo { get; set; }
     }
 }

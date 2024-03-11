@@ -15,6 +15,8 @@ namespace MzTNR.Data.Models.TNR
         public DateTime? FechaInicio { get; set; }
         public DateTime? FechaFin { get; set; }
         public string? Link { get; set; }
+        public int? IdCampeon { get; set; }
+        public string? UrlImagen { get; set; }
         
         // Relaciones uno a uno
         public LigaAmistosa? LigasAmistosas { get; set; }

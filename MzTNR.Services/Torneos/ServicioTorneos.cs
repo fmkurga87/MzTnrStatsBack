@@ -123,6 +123,10 @@ namespace MzTNR.Services.Torneos
             {
                 predicado.And(x => x.FechaInicio.Value.AddDays(-7) <= request.Fecha.Value && request.Fecha.Value <= x.FechaFin.Value.AddDays(10));
             }
+            else
+            {
+                predicado.And(x => x.FechaInicio.Value.AddDays(-7) <= DateTime.Today && DateTime.Today <= x.FechaFin.Value.AddDays(10));
+            }
 
             return predicado;
         }

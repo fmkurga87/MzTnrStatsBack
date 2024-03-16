@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MzTNR.Contracts.Torneos;
 using MzTNR.Contracts.Torneos.RequestResponses;
+using MzTNR.Data.Models.TNR;
 
 namespace MzTNR.Web.Controllers
 {
@@ -42,6 +43,15 @@ namespace MzTNR.Web.Controllers
             var modificarTorneoResponse = await _servicioTorneos.ModificarTorneo(modificarTorneoRequest);
 
             return Ok(modificarTorneoResponse);
+        }
+
+        [HttpPut]
+        [Route("/api/Imagen")]
+        public async Task<ActionResult> Put([FromBody] CargarUrlImagenRequest cargarUrlImagenRequest)
+        {
+            var cargarUrlImagenResponse = await _servicioTorneos.CargarUrlImagen(cargarUrlImagenRequest);
+
+            return Ok(cargarUrlImagenResponse);
         }
 
         [HttpGet]

@@ -56,9 +56,55 @@ namespace MzTNR.Services.Torneos
             return new CrearTorneoResponse() { Id = id };
         }
 
-        public Task<ModificarTorneoResponse> ModificarTorneo(ModificarTorneoRequest request)
+        public async Task<ModificarTorneoResponse> ModificarTorneo(ModificarTorneoRequest request)
         {
-            throw new NotImplementedException();
+            ModificarTorneoResponse response = new ModificarTorneoResponse() { Encontrado = true};
+
+            var torneo = await _applicationDbContext.Torneos.FirstOrDefaultAsync(x => x.IdMz == request.Id);
+
+            if (torneo == null)
+            {
+                response.Encontrado = false;
+                response.AddError("Torneo", $"No se encontro el torneo con id: {request.Id}");
+            }
+            else
+            {
+                torneo.Tipo = (int)request.Tipo;
+                torneo.IdMz = request.IdMz;
+                torneo.Nombre = request.Nombre;
+                torneo.Edicion = request.Edicion;
+                torneo.TemporadaMZ = request.TemporadaMZ;
+                torneo.FechaInicio = request.FechaInicio;
+                torneo.FechaFin = request.FechaFin;
+                torneo.Link = request.Link;
+                torneo.IdCampeon = request.IdCampeon;
+                torneo.UrlImagen = request.UrlImagen;
+            }
+
+            await _applicationDbContext.SaveChangesAsync();
+
+            return response;
+        }
+
+        public async Task<CargarUrlImagenResponse> CargarUrlImagen(CargarUrlImagenRequest request)
+        {
+             CargarUrlImagenResponse response = new CargarUrlImagenResponse() { Ok = true};
+
+            var torneo = await _applicationDbContext.Torneos.FirstOrDefaultAsync(x => x.IdMz == request.IdTorneo);
+
+            if (torneo == null)
+            {
+                response.Ok = false;
+                response.AddError("Torneo", $"No se encontro el torneo con id: {request.IdTorneo}");
+            }
+            else
+            {
+                torneo.UrlImagen = request.UrlImagen;
+            }
+
+            await _applicationDbContext.SaveChangesAsync();
+
+            return response;
         }
 
         public async Task<ObtenerTorneoResponse> ObtenerTorneo(ObtenerTorneoRequest request)
@@ -174,5 +220,7 @@ namespace MzTNR.Services.Torneos
 
             return posiciones;
         }
+
+        
     }
 }

@@ -107,6 +107,7 @@ namespace MzTNR.Services.Torneos
             return response;
         }
 
+        
         public async Task<ObtenerTorneoResponse> ObtenerTorneo(ObtenerTorneoRequest request)
         {
             ObtenerTorneoResponse obtenerTorneoResponse = new ObtenerTorneoResponse() {Encontrado = true};

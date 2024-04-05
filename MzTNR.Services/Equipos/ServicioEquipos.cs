@@ -123,6 +123,8 @@ namespace MzTNR.Services.Equipos
         {
             var predicado = PredicateBuilder.New<Equipo>();
 
+            predicado.And(x => x.Borrado == false);
+
             if (!String.IsNullOrEmpty(request.Nombre))
             {
                 predicado.And(x => x.Nombre.Contains(request.Nombre));

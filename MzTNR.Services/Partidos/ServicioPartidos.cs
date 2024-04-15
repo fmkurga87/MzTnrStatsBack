@@ -46,7 +46,7 @@ namespace MzTNR.Services.Partidos
             CrearPartidoResponse crearPartidoResponse = new CrearPartidoResponse();
             
             #region Validaciones
-            if (_applicationDbContext.Partidos.Any(x => x.IdMz == request.IdMz))
+            if (await _applicationDbContext.Partidos.AnyAsync(x => x.IdMz == request.IdMz))
             {
                 crearPartidoResponse.AddError("Partido", "El partido ya fue creado.");
             }

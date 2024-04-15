@@ -11,8 +11,6 @@ namespace MzTNR.Contracts.Equipos.Modelos
     {
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
-        
-        //TODO: Mostrar solo los nombres
         public string? Ciudad { get; set; }
         public string? Provincia { get; set; }
 

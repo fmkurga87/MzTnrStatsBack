@@ -46,7 +46,7 @@ namespace MzTNR.Services.Partidos
             CrearPartidoResponse crearPartidoResponse = new CrearPartidoResponse();
             
             #region Validaciones
-            if (await _applicationDbContext.Partidos.AnyAsync(x => x.IdMz == request.IdMz))
+            if (_applicationDbContext.Partidos.Any(x => x.IdMz == request.IdMz))
             {
                 crearPartidoResponse.AddError("Partido", "El partido ya fue creado.");
             }
@@ -179,7 +179,7 @@ namespace MzTNR.Services.Partidos
 
                     if (partidoDeTNR)
                     {
-                        this.AlmacenarPartido(int.Parse(id), idLocal, resumenPartidoActual.GolesLocal, idVisitante, resumenPartidoActual.GolesVisitante, DateTime.Parse(date), int.Parse(typeId));
+                        await this.AlmacenarPartido(int.Parse(id), idLocal, resumenPartidoActual.GolesLocal, idVisitante, resumenPartidoActual.GolesVisitante, DateTime.Parse(date), int.Parse(typeId));
                     }
 
                     resumenPartidos.Add(resumenPartidoActual);
@@ -288,7 +288,7 @@ namespace MzTNR.Services.Partidos
             return predicado;
         }
 
-        private async void AlmacenarPartido(int idPartido, int idLocal, int golesLocal, int idVisitante, int golesVisitante, DateTime fecha, int torneoId)
+        private async Task AlmacenarPartido(int idPartido, int idLocal, int golesLocal, int idVisitante, int golesVisitante, DateTime fecha, int torneoId)
         {
             if (await _applicationDbContext.Partidos.AnyAsync(x => x.IdMz == idPartido))
             {

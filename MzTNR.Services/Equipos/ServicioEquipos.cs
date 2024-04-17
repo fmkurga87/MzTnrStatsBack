@@ -101,8 +101,8 @@ namespace MzTNR.Services.Equipos
                     UsuarioMZ = equipo.UsuarioMZ,
                     Nombre = equipo.Nombre,
                     Apellido = equipo.Apellido,
-                    Ciudad = equipo.Ciudad.Nombre,
-                    Provincia = equipo.Ciudad.Provincia.Nombre,
+                    Ciudad = equipo.Ciudad != null ? equipo.Ciudad.Nombre : null,
+                    Provincia = equipo.Ciudad != null ? equipo.Ciudad.Provincia.Nombre : null,
                     UrlEscudo = $"https://www.managerzone.com/dynimg/badge.php?team_id={equipo.IdMz}&sport=soccer",
                     PartidosJugados = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz, 1),
                     PartidosProximos = await _servicioPartidos.ObtenerPartidosXML(equipo.IdMz, 2)

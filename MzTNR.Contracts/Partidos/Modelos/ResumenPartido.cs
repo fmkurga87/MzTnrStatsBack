@@ -14,6 +14,7 @@ namespace MzTNR.Contracts.Partidos.Modelos
         // Para el tipo se podria agregar un enum
         public EnumTipoPartidoEng TipoPartido { get; set; }
         public bool EsTNR { get; set; }
+        public int? IdTorneo { get; set; }
         public string? NombreTorneo { get; set; }
         public string? EquipoLocal { get; set; }  
         public int GolesLocal { get; set; }

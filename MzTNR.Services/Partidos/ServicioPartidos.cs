@@ -179,6 +179,7 @@ namespace MzTNR.Services.Partidos
 
                     if (partidoDeTNR)
                     {
+                        resumenPartidoActual.IdTorneo = Int32.Parse(typeId);
                         await this.AlmacenarPartido(int.Parse(id), idLocal, resumenPartidoActual.GolesLocal, idVisitante, resumenPartidoActual.GolesVisitante, DateTime.Parse(date), int.Parse(typeId));
                     }
 

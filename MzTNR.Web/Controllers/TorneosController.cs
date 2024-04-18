@@ -79,5 +79,14 @@ namespace MzTNR.Web.Controllers
 
             return Ok(obtenerTorneoResponse);
         }
+
+        [HttpGet]
+        [Route("Lista")]
+        public async Task<ActionResult> Get()
+        {
+            var listaTorneos = await _servicioTorneos.ListarTorneos();
+
+            return Ok(listaTorneos);
+        }
     }
 }

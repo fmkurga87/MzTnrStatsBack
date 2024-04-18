@@ -15,11 +15,15 @@ using MzTNR.Contracts.Torneos.DTOs;
 using MzTNR.Contracts.Torneos.Modelos;
 using MzTNR.Contracts.Torneos.RequestResponses;
 using MzTNR.Data.Models.TNR;
+using MzTNR.Services.Extensiones;
 
 namespace MzTNR.Services.Profiles
 {
     public class AutoMapperConfiguration : Profile
     {
+        private readonly MetodosComunes _metodosComunes;
+        
+
         public AutoMapperConfiguration()
         {
             #region Ciudades
@@ -50,10 +54,20 @@ namespace MzTNR.Services.Profiles
                 // TODO: Agregar mapeo a la URL de imagen del torneo
                 CreateMap<Torneo, TorneoDTO>()
                     .ForMember(dest => dest.UrlImagen, opt => opt.MapFrom(source => source.UrlImagen));
+                CreateMap<Torneo, TorneoListaDTO>()
+                    .ForMember(dest => dest.EnCurso, opt => opt.MapFrom(source => EsActual(source.FechaInicio, source.FechaFin)));
                 CreateMap<Torneo, TorneoCompleto>();
                 CreateMap<CrearTorneoRequest, Torneo>();
             #endregion
 
         }   
+
+        public static bool EsActual(DateTime? fechaDesde, DateTime? fechaHasta)
+        {
+            if (fechaDesde.HasValue && fechaHasta.HasValue)
+                return DateTime.Now >= fechaDesde && DateTime.Now <= fechaHasta;
+
+            return false;
+        }
     }
 }

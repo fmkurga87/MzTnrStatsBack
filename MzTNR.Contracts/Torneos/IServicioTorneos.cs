@@ -14,5 +14,6 @@ namespace MzTNR.Contracts.Torneos
         Task<ObtenerTorneoResponse> ObtenerTorneo(ObtenerTorneoRequest request);
         Task<CargarUrlImagenResponse> CargarUrlImagen(CargarUrlImagenRequest request);
         Task<BuscarTorneosResponse> BuscarTorneosMock(int cant);
+        Task<ListarTorneosResponse> ListarTorneos();
     }
 }

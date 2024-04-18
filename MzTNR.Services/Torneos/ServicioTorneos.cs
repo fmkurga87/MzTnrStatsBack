@@ -136,6 +136,13 @@ namespace MzTNR.Services.Torneos
             return obtenerTorneoResponse;
         }
 
+        public async Task<ListarTorneosResponse> ListarTorneos()
+        {
+            var torneos = _applicationDbContext.Torneos.OrderByDescending(x => x.Edicion).ToList();
+
+            return new ListarTorneosResponse{ Torneos = _mapper.Map<List<TorneoListaDTO>>(torneos)};
+        }
+
         private static Expression<Func<Torneo, bool>> ObtenerPredicadoTorneos(BuscarTorneosRequest request)
         {
             var predicado = PredicateBuilder.New<Torneo>();

@@ -8,6 +8,6 @@ namespace MzTNR.Contracts.Torneos.RequestResponses
 {
     public class ListarTorneosResponse
     {
-        public List<TorneoListaDTO> Torneos { get; set; }
+        public List<TorneoListaDTO> TorneosPorTemporada { get; set; }
     }
 }

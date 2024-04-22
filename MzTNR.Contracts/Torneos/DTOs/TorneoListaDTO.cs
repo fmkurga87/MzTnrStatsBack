@@ -7,10 +7,15 @@ namespace MzTNR.Contracts.Torneos.DTOs
 {
     public class TorneoListaDTO
     {
+        public int TemporadaMZ { get; set; }
+        public List<ResumenTorneoDTO> Torneos { get; set; }
+    }
+
+    public class ResumenTorneoDTO
+    {
         public int IdMz { get; set; }
         public string? Nombre { get; set; }
         public int Edicion { get; set; }
-        public int TemporadaMZ { get; set; }
         public bool EnCurso { get; set; }
     }
 }

@@ -138,9 +138,18 @@ namespace MzTNR.Services.Torneos
 
         public async Task<ListarTorneosResponse> ListarTorneos()
         {
-            var torneos = _applicationDbContext.Torneos.OrderByDescending(x => x.Edicion).ToList();
+            List<TorneoListaDTO> torneoListaDTO = new List<TorneoListaDTO>();
 
-            return new ListarTorneosResponse{ Torneos = _mapper.Map<List<TorneoListaDTO>>(torneos)};
+            var torneos = _applicationDbContext.Torneos.OrderByDescending(x => x.TemporadaMZ).ToList();
+
+            foreach (var temporada in torneos.Select(x => x.TemporadaMZ).Distinct())
+            {
+                torneoListaDTO.Add( new TorneoListaDTO() { TemporadaMZ = temporada,
+                    Torneos = _mapper.Map<List<ResumenTorneoDTO>>(torneos.Where(x => x.TemporadaMZ == temporada).ToList()) 
+                });
+            }
+
+            return new ListarTorneosResponse() { TorneosPorTemporada = torneoListaDTO };
         }
 
         private static Expression<Func<Torneo, bool>> ObtenerPredicadoTorneos(BuscarTorneosRequest request)

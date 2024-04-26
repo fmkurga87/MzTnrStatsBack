@@ -40,7 +40,7 @@ namespace MzTNR.Data.Data
                 .HasKey(x => x.IdMz);
 
             builder.Entity<LigaAmistosa>()
-                .HasKey(x => x.IdMz);
+                .HasKey(x => new {x.IdMz, x.Posicion});
 
             builder.Entity<Torneo>()
                 .HasKey(x => x.IdMz);

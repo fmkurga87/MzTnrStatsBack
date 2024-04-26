@@ -8,8 +8,10 @@ namespace MzTNR.Data.Models.TNR
     public class LigaAmistosa
     {
         public int IdMz { get; set; }
-        public virtual Torneo? Torneo { get; set; }
-        public int? TorneoId { get; set; } 
+
+        // Seria igual a IdMz
+        /*public virtual Torneo? Torneo { get; set; }
+        public int? TorneoId { get; set; } */
 
         public int Posicion { get; set; }
 

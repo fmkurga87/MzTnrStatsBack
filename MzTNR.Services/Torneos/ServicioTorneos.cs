@@ -21,12 +21,13 @@ namespace MzTNR.Services.Torneos
     {
         private ApplicationDbContext _applicationDbContext;
         private readonly IMapper _mapper;
+        private readonly MetodosComunes _metodosComunes;
         
         public ServicioTorneos(ApplicationDbContext applicationDbContext, IMapper mapper)
         {
             _mapper = mapper;
             _applicationDbContext = applicationDbContext;
-            
+            _metodosComunes = new MetodosComunes(_applicationDbContext);
         }
         public async Task<BuscarTorneosResponse> BuscarTorneos(BuscarTorneosRequest request)
         {
@@ -124,7 +125,7 @@ namespace MzTNR.Services.Torneos
                 obtenerTorneoResponse.Torneo = _mapper.Map<TorneoCompleto>(torneo);
                 if (torneo.Tipo == 1)
                 {
-                    obtenerTorneoResponse.Torneo.DatosLA = ObtenerDatosLA(torneo.IdMz);
+                    obtenerTorneoResponse.Torneo.DatosLA = await ObtenerDatosLA(torneo.IdMz);
                 }
                 else
                 {
@@ -151,6 +152,28 @@ namespace MzTNR.Services.Torneos
 
             return new ListarTorneosResponse() { TorneosPorTemporada = torneoListaDTO };
         }
+
+        public async Task<ListarTorneosResponse> ListarTorneosPorEquipo(int IdMzEquipo)
+        {
+            List<TorneoListaDTO> torneoListaDTO = new List<TorneoListaDTO>();
+
+            var torneosIds = await _applicationDbContext.LigasAmistosas.Where(x => x.EquipoId == IdMzEquipo).Select(y => y.IdMz).ToListAsync();
+            
+            // TODO: Agregar los ids de Copas
+            //torneosIds.AddRange();
+
+            var torneosDeEquipo = _applicationDbContext.Torneos.Where(x => torneosIds.Contains(x.IdMz)).OrderByDescending(x => x.TemporadaMZ).ToList();
+            
+            foreach (var temporada in torneosDeEquipo.Select(x => x.TemporadaMZ).Distinct())
+            {
+                torneoListaDTO.Add( new TorneoListaDTO() { TemporadaMZ = temporada,
+                    Torneos = _mapper.Map<List<ResumenTorneoDTO>>(torneosDeEquipo.Where(x => x.TemporadaMZ == temporada).ToList()) 
+                });
+            }
+
+            return new ListarTorneosResponse() { TorneosPorTemporada = torneoListaDTO };
+        }
+    
 
         private static Expression<Func<Torneo, bool>> ObtenerPredicadoTorneos(BuscarTorneosRequest request)
         {
@@ -194,7 +217,7 @@ namespace MzTNR.Services.Torneos
             return predicado;
         }
 
-        private List<PosicionLigaAmistosa> ObtenerDatosLA(int idMzLA)
+        private async Task<List<PosicionLigaAmistosa>> ObtenerDatosLA(int idMzLA)
         {
             List<PosicionLigaAmistosa> posiciones = new List<PosicionLigaAmistosa>();
 
@@ -219,11 +242,12 @@ namespace MzTNR.Services.Torneos
 
             foreach (var team in teams)
             {
-                posiciones.Add( new PosicionLigaAmistosa() 
+                PosicionLigaAmistosa posicionLigaAmistosa =  new PosicionLigaAmistosa() 
                 {
                     TorneoId = idMzLA,
                     Posicion  = team.Position,
                     EquipoId  = team.TeamId,
+                    EquipoNombre = team.TeamName,
                     PartidosJugados  = team.Played,
                     PartidosGanados  = team.Won,
                     PartidosEmpatados  = team.Drawn,
@@ -232,12 +256,53 @@ namespace MzTNR.Services.Torneos
                     GolesEnContra  = team.GoalsMinus,
                     DiferenciaGol  = team.GoalsDifference,
                     Puntos  = team.Points,
-                });
+                };
+
+                await ActualizarLA(posicionLigaAmistosa);
+                
+                posiciones.Add(posicionLigaAmistosa);
             }
 
             return posiciones;
         }
 
-        
+        private async Task ActualizarLA(PosicionLigaAmistosa posicionLigaAmistosa)
+        {
+            var liga = await _applicationDbContext.LigasAmistosas.FirstOrDefaultAsync(x => x.IdMz == posicionLigaAmistosa.TorneoId && x.Posicion == posicionLigaAmistosa.Posicion);
+
+            if (liga == null)
+            {
+                await _metodosComunes.ValidarEquipo(posicionLigaAmistosa.EquipoId.Value, posicionLigaAmistosa.EquipoNombre);
+
+                _applicationDbContext.LigasAmistosas.Add( new LigaAmistosa() {
+                    IdMz = posicionLigaAmistosa.TorneoId.Value,
+                    Posicion = posicionLigaAmistosa.Posicion,
+                    EquipoId = posicionLigaAmistosa.EquipoId.Value,
+                    PartidosGanados = posicionLigaAmistosa.PartidosGanados,
+                    PartidosEmpatados = posicionLigaAmistosa.PartidosEmpatados,
+                    PartidosPerdidos = posicionLigaAmistosa.PartidosPerdidos,
+                    GolesAFavor = posicionLigaAmistosa.GolesAFavor,
+                    GolesEnContra = posicionLigaAmistosa.GolesEnContra
+                });
+
+                await _applicationDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                if (liga.PartidosGanados + liga.PartidosEmpatados + liga.PartidosPerdidos != posicionLigaAmistosa.PartidosJugados)
+                {
+                    liga.EquipoId = posicionLigaAmistosa.EquipoId.Value;
+                    liga.PartidosGanados = posicionLigaAmistosa.PartidosGanados;
+                    liga.PartidosEmpatados = posicionLigaAmistosa.PartidosEmpatados;
+                    liga.PartidosPerdidos = posicionLigaAmistosa.PartidosPerdidos;
+                    liga.GolesAFavor = posicionLigaAmistosa.GolesAFavor;
+                    liga.GolesEnContra = posicionLigaAmistosa.GolesEnContra;
+
+                    await _applicationDbContext.SaveChangesAsync();
+                }
+            }
+
+            return;
+        }
     }
 }

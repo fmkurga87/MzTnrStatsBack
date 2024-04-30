@@ -67,5 +67,14 @@ namespace MzTNR.Web.Controllers
 
             return Ok(obtenerPartidoResponse);
         }
+
+        [HttpGet]
+        [Route("Historico")]
+        public async Task<ActionResult> GetHistoral([FromQuery] BuscarHistorialRequest buscarHistorialRequest)
+        {
+            var buscarHistorialResponse = await _servicioPartidos.BuscarHistorial(buscarHistorialRequest);
+
+            return Ok(buscarHistorialResponse);
+        }
     }
 }

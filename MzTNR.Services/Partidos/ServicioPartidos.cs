@@ -111,6 +111,31 @@ namespace MzTNR.Services.Partidos
             return cargarResultadoResponse;
         }
 
+        public async Task<BuscarHistorialResponse> BuscarHistorial(BuscarHistorialRequest request)
+        {
+            BuscarHistorialResponse buscarHistorialResponse = new BuscarHistorialResponse ();
+
+            var partidos = await _applicationDbContext.Partidos.Where(x => x.Fecha < DateTime.Now &&
+                                                                    ((x.EquipoLocalId == request.IdEquipo1 && x.EquipoVisitanteId == request.IdEquipo2)
+                                                                ||  (x.EquipoVisitanteId == request.IdEquipo1 && x.EquipoLocalId == request.IdEquipo2 )))
+                                                        .ToListAsync();
+
+            if (partidos.Count > 0)
+            {
+                buscarHistorialResponse.TotalPartidos = partidos.Count();
+                buscarHistorialResponse.GanadosEquipo1 = partidos.Where( x => (x.EquipoLocalId == request.IdEquipo1 && x.GolesLocal > x.GolesVisitante)
+                                                                        ||  (x.EquipoVisitanteId == request.IdEquipo1 && x.GolesLocal < x.GolesVisitante)).Count();
+                buscarHistorialResponse.Empatados = partidos.Where(x => x.GolesLocal == x.GolesVisitante).Count();
+                buscarHistorialResponse.GanadosEquipo2 = buscarHistorialResponse.TotalPartidos - buscarHistorialResponse.GanadosEquipo1 - buscarHistorialResponse.Empatados;
+            }
+            else
+            {
+                buscarHistorialResponse.AddError ("Partidos", "No se encontraron partidos jugados entre los equipos seleccionados");
+            }
+            
+            return buscarHistorialResponse;
+        }
+
         public async Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos)
         {
             List<ResumenPartido> resumenPartidos = new List<ResumenPartido>();
@@ -317,7 +342,5 @@ namespace MzTNR.Services.Partidos
             
             return;
         }
-
-        
     }
 }

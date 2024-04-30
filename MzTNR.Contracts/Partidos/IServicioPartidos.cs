@@ -21,5 +21,6 @@ namespace MzTNR.Contracts.Partidos
         /// <returns></returns>
         Task<List<ResumenPartido>> ObtenerPartidosXML(int idEquipo, int tipoPartidos);
         Task<CargarResultadoResponse> CargarResultado(CargarResultadoRequest request);
+        Task<BuscarHistorialResponse> BuscarHistorial(BuscarHistorialRequest request);
     }
 }

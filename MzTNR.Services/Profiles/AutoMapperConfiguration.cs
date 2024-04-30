@@ -8,6 +8,7 @@ using MzTNR.Contracts.Ciudades.RequestResponses;
 using MzTNR.Contracts.Equipos.Modelos;
 using MzTNR.Contracts.Equipos.RequestResponses;
 using MzTNR.Contracts.Partidos.DTOs;
+using MzTNR.Contracts.Partidos.Modelos;
 using MzTNR.Contracts.Partidos.RequetResponses;
 using MzTNR.Contracts.Provincias.DTOs;
 using MzTNR.Contracts.Provincias.RequestResponses;
@@ -21,9 +22,6 @@ namespace MzTNR.Services.Profiles
 {
     public class AutoMapperConfiguration : Profile
     {
-        private readonly MetodosComunes _metodosComunes;
-        
-
         public AutoMapperConfiguration()
         {
             #region Ciudades
@@ -39,6 +37,7 @@ namespace MzTNR.Services.Profiles
             #region Partidos
             CreateMap<Partido, PartidoDTO>();
             CreateMap<CrearPartidoRequest, Partido>();
+            CreateMap<Partido, ResumenPartido>();
             #endregion
 
             #region Provincias

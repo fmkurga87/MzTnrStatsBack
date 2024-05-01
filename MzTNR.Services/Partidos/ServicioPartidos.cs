@@ -115,9 +115,11 @@ namespace MzTNR.Services.Partidos
         {
             BuscarHistorialResponse buscarHistorialResponse = new BuscarHistorialResponse ();
 
-            var partidos = await _applicationDbContext.Partidos.Where(x => x.Fecha < DateTime.Now &&
+            var partidos = await _applicationDbContext.Partidos
+                                                        .Where(x => x.Fecha < DateTime.Now &&
                                                                     ((x.EquipoLocalId == request.IdEquipo1 && x.EquipoVisitanteId == request.IdEquipo2)
                                                                 ||  (x.EquipoVisitanteId == request.IdEquipo1 && x.EquipoLocalId == request.IdEquipo2 )))
+                                                        .Include(p => p.Torneo).Include(p => p.EquipoLocal).Include(p => p.EquipoVisitante)
                                                         .ToListAsync();
 
             if (partidos.Count > 0)
@@ -127,6 +129,24 @@ namespace MzTNR.Services.Partidos
                                                                         ||  (x.EquipoVisitanteId == request.IdEquipo1 && x.GolesLocal < x.GolesVisitante)).Count();
                 buscarHistorialResponse.Empatados = partidos.Where(x => x.GolesLocal == x.GolesVisitante).Count();
                 buscarHistorialResponse.GanadosEquipo2 = buscarHistorialResponse.TotalPartidos - buscarHistorialResponse.GanadosEquipo1 - buscarHistorialResponse.Empatados;
+
+                List<ResumenPartido> listaPartidos = new List<ResumenPartido>();
+                foreach (var partido in partidos)
+                {
+                    listaPartidos.Add( new ResumenPartido()
+                    {
+                        TipoPartido = 0,
+                        EsTNR = true,
+                        IdTorneo = partido.TorneoId,
+                        NombreTorneo = partido.Torneo?.Nombre,
+                        EquipoLocal = partido.EquipoLocal?.NombreEquipo,
+                        GolesLocal = partido.GolesLocal,
+                        EquipoVisitante = partido.EquipoVisitante?.NombreEquipo,
+                        GolesVisitante = partido.GolesVisitante,
+                    });
+                }
+
+                buscarHistorialResponse.Partidos = listaPartidos;
             }
             else
             {

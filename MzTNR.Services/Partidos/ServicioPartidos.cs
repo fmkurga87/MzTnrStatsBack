@@ -125,9 +125,11 @@ namespace MzTNR.Services.Partidos
             if (partidos.Count > 0)
             {
                 buscarHistorialResponse.TotalPartidos = partidos.Count();
+                buscarHistorialResponse.Equipo1 = partidos[0].EquipoLocal.IdMz == request.IdEquipo1 ? partidos[0].EquipoLocal.NombreEquipo : partidos[0].EquipoVisitante.NombreEquipo;
                 buscarHistorialResponse.GanadosEquipo1 = partidos.Where( x => (x.EquipoLocalId == request.IdEquipo1 && x.GolesLocal > x.GolesVisitante)
                                                                         ||  (x.EquipoVisitanteId == request.IdEquipo1 && x.GolesLocal < x.GolesVisitante)).Count();
                 buscarHistorialResponse.Empatados = partidos.Where(x => x.GolesLocal == x.GolesVisitante).Count();
+                buscarHistorialResponse.Equipo2 = partidos[0].EquipoLocal.IdMz == request.IdEquipo1 ? partidos[0].EquipoVisitante.NombreEquipo : partidos[0].EquipoLocal.NombreEquipo;
                 buscarHistorialResponse.GanadosEquipo2 = buscarHistorialResponse.TotalPartidos - buscarHistorialResponse.GanadosEquipo1 - buscarHistorialResponse.Empatados;
 
                 List<ResumenPartido> listaPartidos = new List<ResumenPartido>();

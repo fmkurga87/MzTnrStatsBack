@@ -73,13 +73,40 @@ namespace MzTNR.Services.Partidos
 
         }
 
-        public Task<ModificarPartidoResponse> ModificarPartido(ModificarPartidoRequest request)
+        public async Task<ModificarPartidoResponse> ModificarPartido(ModificarPartidoRequest request)
         {
-            throw new NotImplementedException();
+            ModificarPartidoResponse modificarPartidoResponse = new ModificarPartidoResponse();
+            
+            #region Validaciones
+            if (!_applicationDbContext.Partidos.Any(x => x.IdMz == request.IdMz))
+            {
+                modificarPartidoResponse.AddError("Partido", "El partido no existe.");
+            }
+
+            if (request.EquipoLocalId == 0 || request.EquipoVisitanteId == 0)
+            {
+                modificarPartidoResponse.AddError("Equipo", "El equipo local y/o el equipo visitante no fue encontrado.");
+            }
+
+            if (request.TorneoId == 0)
+            {
+                modificarPartidoResponse.AddError("Torneo", "El torneo no fue encontrado.");
+            }
+            #endregion
+
+            if (modificarPartidoResponse.Errores.Count() == 0)
+            {
+                var partidoNuevo = _mapper.Map<Partido>(request);
+                _applicationDbContext.Partidos.Add(partidoNuevo);
+                //modificarPartidoResponse.Id = await _applicationDbContext.SaveChangesAsync();
+            }
+            
+            return modificarPartidoResponse;
         }
 
         public async Task<ObtenerPartidoResponse> ObtenerPartido(ObtenerPartidoRequest request)
         {
+            // TODO: Argegar una busqueda por lo que tenemos en BD
             var partidoXML  = await ObtenerFichaPartidoXML(request.Id);
 
             return new ObtenerPartidoResponse() {

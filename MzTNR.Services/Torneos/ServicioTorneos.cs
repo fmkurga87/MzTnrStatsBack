@@ -57,6 +57,38 @@ namespace MzTNR.Services.Torneos
             return new CrearTorneoResponse() { Id = id };
         }
 
+        public async Task<CrearGrupoCopaResponse> CrearGrupoCopa(CrearGrupoCopaRequest request)
+        {
+            
+            CrearGrupoCopaResponse response = new CrearGrupoCopaResponse();
+            // TODO: Agregar validaciones
+
+            if (response.Errores.Count == 0)
+            {
+                foreach (var GrupoCopa in request.PosicionesGrupo)
+                {
+                    FaseGrupo faseGrupo = new FaseGrupo()
+                    {
+                        TorneoId = request.TorneoId,
+                        Grupo = request.Grupo,
+                        Posicion = GrupoCopa.Posicion,
+                        EquipoId = GrupoCopa.EquipoId,
+                        PartidosGanados = GrupoCopa.PartidosGanados,
+                        PartidosEmpatados = GrupoCopa.PartidosEmpatados,
+                        PartidosPerdidos = GrupoCopa.PartidosPerdidos,
+                        GolesAFavor = GrupoCopa.GolesAFavor,
+                        GolesEnContra = GrupoCopa.GolesEnContra,
+                    };
+
+                    _applicationDbContext.FasesGrupos.Add(faseGrupo);
+                }
+
+                await _applicationDbContext.SaveChangesAsync();
+            }
+
+            return response;
+        }
+
         public async Task<ModificarTorneoResponse> ModificarTorneo(ModificarTorneoRequest request)
         {
             ModificarTorneoResponse response = new ModificarTorneoResponse() { Encontrado = true};
@@ -111,6 +143,7 @@ namespace MzTNR.Services.Torneos
         
         public async Task<ObtenerTorneoResponse> ObtenerTorneo(ObtenerTorneoRequest request)
         {
+            // NOTA: Los partidos y playoffs se cargan en el Servicio Partidos
             ObtenerTorneoResponse obtenerTorneoResponse = new ObtenerTorneoResponse() {Encontrado = true};
 
             var torneo = await _applicationDbContext.Torneos.FirstOrDefaultAsync(x => x.IdMz == request.Id);
@@ -304,5 +337,7 @@ namespace MzTNR.Services.Torneos
 
             return;
         }
+
+        
     }
 }

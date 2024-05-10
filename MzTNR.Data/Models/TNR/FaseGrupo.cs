@@ -12,7 +12,7 @@ namespace MzTNR.Data.Models.TNR
         public virtual Torneo? Torneo { get; set; }
         public int? TorneoId { get; set; } 
 
-        public int Grupo { get; set; }
+        public string? Grupo { get; set; }
         public int Posicion { get; set; }
 
         public virtual Equipo? Equipo { get; set; }

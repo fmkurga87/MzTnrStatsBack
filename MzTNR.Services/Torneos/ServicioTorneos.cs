@@ -162,7 +162,7 @@ namespace MzTNR.Services.Torneos
                 }
                 else
                 {
-                    // TODO: Obtener info de Copa
+                    obtenerTorneoResponse.Torneo.DatosCopa = await ObtenerDatosCopa(torneo.IdMz);
                 }
                 
             }
@@ -298,6 +298,23 @@ namespace MzTNR.Services.Torneos
 
             return posiciones;
         }
+
+        private async Task<Copa> ObtenerDatosCopa(int idMzCopa)
+        {
+            Copa copa = new Copa();
+
+            var grupos = await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idMzCopa).ToListAsync();
+
+            if (grupos.Any())
+            {
+                // TODO: Llenar datos de grupos (Ojo con los grupos). Sacar esto a otra Fx.
+            }
+
+            // TODO: Cargar Playoffs. En principio en la estructura de partidos cargar el dato de grupo. Si es 0, es playoff. Ver si se ocurre una idea mejor.
+
+
+            return copa;
+        } 
 
         private async Task ActualizarLA(PosicionLigaAmistosa posicionLigaAmistosa)
         {

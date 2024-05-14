@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MzTNR.Contracts.Compartidos;
 
 namespace MzTNR.Contracts.Partidos.RequetResponses
 {
@@ -19,6 +20,6 @@ namespace MzTNR.Contracts.Partidos.RequetResponses
         // Fecha 1, Fecha 2...
         public int FechaNumero { get; set; }
         public int? TorneoId { get; set; }
-        public int? Instancia { get; set; }
+        public EnumInstanciaPartido? Instancia { get; set; }
     }
 }

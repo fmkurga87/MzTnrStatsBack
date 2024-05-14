@@ -35,6 +35,16 @@ namespace MzTNR.Web.Controllers
 
             return Ok(crearTorneoResponse);
         }
+
+        [HttpPost]
+        [Route("/api/Grupo")]
+        public async Task<ActionResult> PostGrupo([FromBody] CrearGrupoCopaRequest crearGrupoCopaRequest)
+        {
+            // TODO: Validar request
+            var crearGrupoCopaResponse = await _servicioTorneos.CrearGrupoCopa(crearGrupoCopaRequest);
+
+            return Ok(crearGrupoCopaResponse);
+        }
     
         [HttpPut]
         public async Task<ActionResult> Put([FromBody] ModificarTorneoRequest modificarTorneoRequest)

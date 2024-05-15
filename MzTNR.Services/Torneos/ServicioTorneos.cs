@@ -189,11 +189,9 @@ namespace MzTNR.Services.Torneos
         public async Task<ListarTorneosResponse> ListarTorneosPorEquipo(int IdMzEquipo)
         {
             List<TorneoListaDTO> torneoListaDTO = new List<TorneoListaDTO>();
-
-            var torneosIds = await _applicationDbContext.LigasAmistosas.Where(x => x.EquipoId == IdMzEquipo).Select(y => y.IdMz).ToListAsync();
             
-            // TODO: Agregar los ids de Copas
-            //torneosIds.AddRange();
+            var torneosIds = await _applicationDbContext.LigasAmistosas.Where(x => x.EquipoId == IdMzEquipo).Select(y => y.IdMz).ToListAsync();
+            torneosIds.AddRange(await _applicationDbContext.FasesGrupos.Where(x => x.EquipoId == IdMzEquipo && x.TorneoId.HasValue).Select(y => y.TorneoId.Value).ToListAsync());
 
             var torneosDeEquipo = _applicationDbContext.Torneos.Where(x => torneosIds.Contains(x.IdMz)).OrderByDescending(x => x.TemporadaMZ).ToList();
             

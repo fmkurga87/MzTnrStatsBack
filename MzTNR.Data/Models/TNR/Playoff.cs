@@ -8,6 +8,8 @@ namespace MzTNR.Data.Models.TNR
     public class Playoff
     {
         public int Id { get; set; }
+        public int IdTorneo { get; set; }
         public int Instancia { get; set; }
+        public int IdPartido { get; set; }
     }
 }

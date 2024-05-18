@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MzTNR.Data.Data;
 
@@ -10,9 +11,11 @@ using MzTNR.Data.Data;
 namespace MzTNR.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240515200558_ActualizandoPlayoffs")]
+    partial class ActualizandoPlayoffs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,13 +287,8 @@ namespace MzTNR.Data.Migrations
 
             modelBuilder.Entity("MzTNR.Data.Models.TNR.FaseGrupo", b =>
                 {
-                    b.Property<int?>("TorneoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Grupo")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<int>("Posicion")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int?>("EquipoId")
@@ -302,8 +300,8 @@ namespace MzTNR.Data.Migrations
                     b.Property<int>("GolesEnContra")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
+                    b.Property<string>("Grupo")
+                        .HasColumnType("longtext");
 
                     b.Property<int>("PartidosEmpatados")
                         .HasColumnType("int");
@@ -314,9 +312,18 @@ namespace MzTNR.Data.Migrations
                     b.Property<int>("PartidosPerdidos")
                         .HasColumnType("int");
 
-                    b.HasKey("TorneoId", "Grupo", "Posicion");
+                    b.Property<int>("Posicion")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TorneoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("EquipoId");
+
+                    b.HasIndex("TorneoId")
+                        .IsUnique();
 
                     b.ToTable("FasesGrupos");
                 });
@@ -592,10 +599,8 @@ namespace MzTNR.Data.Migrations
                         .HasForeignKey("EquipoId");
 
                     b.HasOne("MzTNR.Data.Models.TNR.Torneo", "Torneo")
-                        .WithMany("FasesGrupos")
-                        .HasForeignKey("TorneoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("FasesGrupos")
+                        .HasForeignKey("MzTNR.Data.Models.TNR.FaseGrupo", "TorneoId");
 
                     b.Navigation("Equipo");
 

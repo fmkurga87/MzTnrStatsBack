@@ -47,7 +47,20 @@ namespace MzTNR.Data.Data
                 //.HasKey(x => new {x.Tipo, x.IdMz});
 
             //--
-            
+
+            //++ PKs Compuestas
+            builder.Entity<FaseGrupo>()
+                .HasKey(x => new {x.TorneoId, x.Grupo, x.Posicion});
+            //--
+
+            //++ Relacion Torneo <--->> Fase Grupos
+            builder.Entity<Torneo>()
+                .HasMany(t => t.FasesGrupos)
+                .WithOne(fg => fg.Torneo)
+                .HasForeignKey(t => t.TorneoId)
+                .IsRequired();
+            //--
+
             //++ Relacion Users <<--->> Roles
             builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)

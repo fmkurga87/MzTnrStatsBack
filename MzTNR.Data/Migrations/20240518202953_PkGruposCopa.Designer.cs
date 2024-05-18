@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MzTNR.Data.Data;
 
@@ -10,9 +11,11 @@ using MzTNR.Data.Data;
 namespace MzTNR.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240518202953_PkGruposCopa")]
+    partial class PkGruposCopa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,6 +321,9 @@ namespace MzTNR.Data.Migrations
 
                     b.HasIndex("EquipoId");
 
+                    b.HasIndex("TorneoId")
+                        .IsUnique();
+
                     b.ToTable("FasesGrupos");
                 });
 
@@ -592,8 +598,8 @@ namespace MzTNR.Data.Migrations
                         .HasForeignKey("EquipoId");
 
                     b.HasOne("MzTNR.Data.Models.TNR.Torneo", "Torneo")
-                        .WithMany("FasesGrupos")
-                        .HasForeignKey("TorneoId")
+                        .WithOne("FasesGrupos")
+                        .HasForeignKey("MzTNR.Data.Models.TNR.FaseGrupo", "TorneoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

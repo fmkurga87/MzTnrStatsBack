@@ -59,14 +59,15 @@ namespace MzTNR.Services.Torneos
 
         public async Task<CrearGrupoCopaResponse> CrearGrupoCopa(CrearGrupoCopaRequest request)
         {
-            
             CrearGrupoCopaResponse response = new CrearGrupoCopaResponse();
-            // TODO: Agregar validaciones
+            // TODO: Agregar validaciones y controles por PK
 
             if (response.Errores.Count == 0)
             {
                 foreach (var GrupoCopa in request.PosicionesGrupo)
                 {
+                    await _metodosComunes.ValidarEquipo(GrupoCopa.EquipoId.Value, GrupoCopa.EquipoNombre);
+
                     FaseGrupo faseGrupo = new FaseGrupo()
                     {
                         TorneoId = request.TorneoId,
@@ -301,18 +302,32 @@ namespace MzTNR.Services.Torneos
         {
             Copa copa = new Copa();
 
-            var grupos = await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idMzCopa).ToListAsync();
+            var grupos = await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idMzCopa).Select(y => y.Grupo).Distinct().ToListAsync();
 
             if (grupos.Any())
             {
-                // TODO: Llenar datos de grupos (Ojo con los grupos). Sacar esto a otra Fx.
+                copa.Grupos = new List<GrupoCopa>();
+                grupos.ForEach(async x => {
+                    copa.Grupos.Add(await ObtenerGrupoCopaAsync(idMzCopa, x));
+                    });
             }
 
-            // TODO: Cargar Playoffs. En principio en la estructura de partidos cargar el dato de grupo. Si es 0, es playoff. Ver si se ocurre una idea mejor.
+            // TODO: Cargar Playoffs. Al modelo de Playoff se le agrego el id de partido, entonces tenemos idtorneo-instancia-idpartido. Sacar a otra Fx.
 
 
             return copa;
         } 
+
+        private async Task<GrupoCopa> ObtenerGrupoCopaAsync(int idTorneo, string grupo)
+        {
+            GrupoCopa grupoCopa = new GrupoCopa
+            {
+                Grupo = grupo,
+                PosicionesGrupo = _mapper.Map<List<PosicionGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync())
+            };
+
+            return grupoCopa;
+        }
 
         private async Task ActualizarLA(PosicionLigaAmistosa posicionLigaAmistosa)
         {

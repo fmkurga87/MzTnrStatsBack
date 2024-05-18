@@ -20,10 +20,10 @@ namespace MzTNR.Data.Models.TNR
         
         // Relaciones uno a uno
         public LigaAmistosa? LigasAmistosas { get; set; }
-        public FaseGrupo? FasesGrupos { get; set; }
         public Imagen? Imagen { get; set;}
 
         // Uno a Muchos
+        public ICollection<FaseGrupo>? FasesGrupos { get; set; }
         public ICollection<Playoff>? Playoffs { get; set; }
         public ICollection<Partido>? Partidos { get; set; }
     }

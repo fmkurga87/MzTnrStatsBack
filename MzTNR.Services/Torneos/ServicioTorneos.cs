@@ -64,7 +64,7 @@ namespace MzTNR.Services.Torneos
 
             if (response.Errores.Count == 0)
             {
-                foreach (var GrupoCopa in request.PosicionesGrupo)
+                foreach (var GrupoCopa in request.EquiposGrupo)
                 {
                     await _metodosComunes.ValidarEquipo(GrupoCopa.EquipoId.Value, GrupoCopa.EquipoNombre);
 
@@ -72,13 +72,7 @@ namespace MzTNR.Services.Torneos
                     {
                         TorneoId = request.TorneoId,
                         Grupo = request.Grupo,
-                        Posicion = GrupoCopa.Posicion,
                         EquipoId = GrupoCopa.EquipoId,
-                        PartidosGanados = GrupoCopa.PartidosGanados,
-                        PartidosEmpatados = GrupoCopa.PartidosEmpatados,
-                        PartidosPerdidos = GrupoCopa.PartidosPerdidos,
-                        GolesAFavor = GrupoCopa.GolesAFavor,
-                        GolesEnContra = GrupoCopa.GolesEnContra,
                     };
 
                     _applicationDbContext.FasesGrupos.Add(faseGrupo);
@@ -306,6 +300,7 @@ namespace MzTNR.Services.Torneos
 
             if (grupos.Any())
             {
+                // TODO: Calcular posiciones segun los partidos (filtrar x IdMz, TipoPartido = GrupoCopaAmistosa Y buscar los equipos del grupo.)
                 copa.Grupos = new List<GrupoCopa>();
                 grupos.ForEach(async x => {
                     copa.Grupos.Add(await ObtenerGrupoCopaAsync(idMzCopa, x));
@@ -323,7 +318,7 @@ namespace MzTNR.Services.Torneos
             GrupoCopa grupoCopa = new GrupoCopa
             {
                 Grupo = grupo,
-                PosicionesGrupo = _mapper.Map<List<PosicionGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync())
+                EquiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync())
             };
 
             return grupoCopa;

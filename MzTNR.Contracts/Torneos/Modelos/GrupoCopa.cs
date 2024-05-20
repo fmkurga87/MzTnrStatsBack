@@ -8,6 +8,6 @@ namespace MzTNR.Contracts.Torneos.Modelos
     public class GrupoCopa
     {
         public string Grupo { get; set; }
-        public List<PosicionGrupoCopa> PosicionesGrupo { get; set; }
+        public List<EquipoGrupoCopa> EquiposGrupo { get; set; }
     }
 }

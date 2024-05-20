@@ -21,6 +21,7 @@ namespace MzTNR.Data.Models.TNR
 
         public virtual Torneo? Torneo { get; set; }
         public int? TorneoId { get; set; }
+        public int? TipoPartido { get; set; }
         public int? Instancia { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace MzTNR.Data.Data
 
             //++ PKs Compuestas
             builder.Entity<FaseGrupo>()
-                .HasKey(x => new {x.TorneoId, x.Grupo, x.Posicion});
+                .HasKey(x => new {x.TorneoId, x.Grupo, x.EquipoId});
             //--
 
             //++ Relacion Torneo <--->> Fase Grupos

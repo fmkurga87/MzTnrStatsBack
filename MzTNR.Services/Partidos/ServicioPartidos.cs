@@ -254,7 +254,7 @@ namespace MzTNR.Services.Partidos
                     if (partidoDeTNR)
                     {
                         resumenPartidoActual.IdTorneo = Int32.Parse(typeId);
-                        await this.AlmacenarPartido(int.Parse(id), idLocal, resumenPartidoActual.GolesLocal, idVisitante, resumenPartidoActual.GolesVisitante, DateTime.Parse(date), int.Parse(typeId));
+                        await this.AlmacenarPartido(int.Parse(id), idLocal, resumenPartidoActual.GolesLocal, idVisitante, resumenPartidoActual.GolesVisitante, DateTime.Parse(date), int.Parse(typeId), (int)resumenPartidoActual.TipoPartido);
                     }
 
                     resumenPartidos.Add(resumenPartidoActual);
@@ -363,7 +363,7 @@ namespace MzTNR.Services.Partidos
             return predicado;
         }
 
-        private async Task AlmacenarPartido(int idPartido, int idLocal, int golesLocal, int idVisitante, int golesVisitante, DateTime fecha, int torneoId)
+        private async Task AlmacenarPartido(int idPartido, int idLocal, int golesLocal, int idVisitante, int golesVisitante, DateTime fecha, int torneoId, int tipoPartido)
         {
             if (await _applicationDbContext.Partidos.AnyAsync(x => x.IdMz == idPartido))
             {
@@ -385,7 +385,8 @@ namespace MzTNR.Services.Partidos
                     GolesVisitante = golesVisitante,
                     Fecha = fecha,
                     FechaNumero = 0,
-                    TorneoId = torneoId // await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
+                    TorneoId = torneoId, // await _metodosComunes.ObtenerIdTorneo(int.Parse(typeId)),
+                    TipoPartido = tipoPartido,
                 });
             }
             

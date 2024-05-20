@@ -56,8 +56,7 @@ namespace MzTNR.Services.Profiles
                     .ForMember(dest => dest.EnCurso, opt => opt.MapFrom(source => EsActual(source.FechaInicio, source.FechaFin)));
                 CreateMap<Torneo, TorneoCompleto>();
                 CreateMap<CrearTorneoRequest, Torneo>();
-                // TODO: Agregar campos calculados
-                CreateMap<FaseGrupo, PosicionGrupoCopa>();
+                CreateMap<FaseGrupo, EquipoGrupoCopa>();
             #endregion
 
         }   

@@ -302,9 +302,9 @@ namespace MzTNR.Services.Torneos
             {
                 // TODO: Calcular posiciones segun los partidos (filtrar x IdMz, TipoPartido = GrupoCopaAmistosa Y buscar los equipos del grupo.)
                 copa.Grupos = new List<GrupoCopa>();
-                grupos.ForEach(async x => {
+                /*grupos.ForEach(async x => {
                     copa.Grupos.Add(await ObtenerGrupoCopaAsync(idMzCopa, x));
-                    });
+                    });*/
             }
 
             // TODO: Cargar Playoffs. Al modelo de Playoff se le agrego el id de partido, entonces tenemos idtorneo-instancia-idpartido. Sacar a otra Fx.

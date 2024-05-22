@@ -106,13 +106,25 @@ namespace MzTNR.Services.Partidos
 
         public async Task<ObtenerPartidoResponse> ObtenerPartido(ObtenerPartidoRequest request)
         {
-            // TODO: Argegar una busqueda por lo que tenemos en BD
-            var partidoXML  = await ObtenerFichaPartidoXML(request.Id);
+            var partidoBD = await _applicationDbContext.Partidos.FirstOrDefaultAsync(x => x.IdMz == request.Id);
 
-            return new ObtenerPartidoResponse() {
-                Encontrado = partidoXML.Id == 0 ? false : true,
-                Partido = partidoXML
-            };
+            // TODO: Cambiar el response para que sean partidos, generar mapeos y descomentar if. Darle la inteligencia para actualizar la info automaticamente.
+            if (partidoBD == null)
+            {
+                var partidoXML  = await ObtenerFichaPartidoXML(request.Id);
+
+                return new ObtenerPartidoResponse() {
+                    Encontrado = partidoXML.Id == 0 ? false : true,
+                    PartidoMZ = partidoXML
+                };
+            }
+            else
+            {
+                return new ObtenerPartidoResponse() {
+                    Encontrado = true,
+                    PartidoBD = _mapper.Map<ResumenPartido>(partidoBD)
+                };
+            }
             
         }
 
@@ -344,6 +356,20 @@ namespace MzTNR.Services.Partidos
             }            
 
             return detallePartidoXML;
+        }
+
+        private async Task ActualizarPartidoDesdeXML(DetallePartidoXML partidoXML)
+        {
+            //  TODO: Existe el partido en BD
+            //                 -NO-> crearlo
+            //                 -SI-> Verificamos si ya ocurrio
+            //                             -NO-> No se hace nada.
+            //                             -SI-> Verificamo si ya esta actualizado. 
+            //                                         -SI-> No se hace nada.
+            //                                         -NO-> Se actualiza el resultado
+            
+            //var partido = 
+            return;
         }
 
         private static Expression<Func<Partido, bool>> ObtenerPredicadoPartidos(BuscarPartidosRequest request)

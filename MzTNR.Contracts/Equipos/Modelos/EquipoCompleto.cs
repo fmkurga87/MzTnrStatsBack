@@ -13,8 +13,6 @@ namespace MzTNR.Contracts.Equipos.Modelos
         public string? Apellido { get; set; }
         public string? Ciudad { get; set; }
         public string? Provincia { get; set; }
-
-        //TODO: Armar la URL por codigo
         public string? UrlEscudo { get; set; }
         public List<ResumenPartido> PartidosJugados { get; set; }
         public List<ResumenPartido> PartidosProximos { get; set; }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using AutoMapper;
@@ -300,28 +301,74 @@ namespace MzTNR.Services.Torneos
 
             if (grupos.Any())
             {
-                // TODO: Calcular posiciones segun los partidos (filtrar x IdMz, TipoPartido = GrupoCopaAmistosa Y buscar los equipos del grupo.)
                 copa.Grupos = new List<GrupoCopa>();
-                /*grupos.ForEach(async x => {
+                grupos.ForEach(async x => {
                     copa.Grupos.Add(await ObtenerGrupoCopaAsync(idMzCopa, x));
-                    });*/
+                    });
             }
-
-            // TODO: Cargar Playoffs. Al modelo de Playoff se le agrego el id de partido, entonces tenemos idtorneo-instancia-idpartido. Sacar a otra Fx.
-
-
+            
+            copa.Playoff = await ObtenerPlayoffs(idMzCopa);
+            
             return copa;
         } 
 
         private async Task<GrupoCopa> ObtenerGrupoCopaAsync(int idTorneo, string grupo)
         {
+            var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync());
+            
+            var partidosGrupo = await _applicationDbContext.Partidos.Where(x => x.TorneoId == idTorneo
+                                                                        && x.TipoPartido == 6
+                                                                        && equiposGrupo.Select(y => y.EquipoId).Contains(x.EquipoLocalId)
+                                                                         ).ToListAsync();
+            
+            partidosGrupo.ForEach( x => {
+                    var local = equiposGrupo.First(y => y.EquipoId == x.EquipoLocalId);
+                    var visitante = equiposGrupo.First(y => y.EquipoId == x.EquipoVisitanteId);
+                    local.PartidosJugados++;
+                    local.GolesAFavor += x.GolesLocal;
+                    local.GolesEnContra += x.GolesVisitante;
+                    visitante.PartidosJugados++;
+                    visitante.GolesAFavor += x.GolesVisitante;
+                    visitante.GolesEnContra += x.GolesLocal;
+                    
+                    if (x.GolesLocal > x.GolesVisitante)
+                    {
+                        local.PartidosGanados++;
+                        local.Puntos += 3;
+                        visitante.PartidosPerdidos++;
+                    }
+                    else if (x.GolesVisitante > x.GolesLocal)
+                    {
+                        local.PartidosPerdidos++;
+                        visitante.PartidosGanados++;
+                        visitante.Puntos += 3;
+                    }
+                    else
+                    {
+                        local.PartidosEmpatados++;
+                        local.Puntos++;
+                        visitante.PartidosEmpatados++;
+                        visitante.Puntos++;
+                    }
+                    local.DiferenciaGol = local.GolesAFavor - local.GolesEnContra;
+                    visitante.DiferenciaGol = visitante.GolesAFavor - visitante.GolesEnContra;
+                }
+            ); 
+
             GrupoCopa grupoCopa = new GrupoCopa
             {
                 Grupo = grupo,
-                EquiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync())
+                EquiposGrupo = equiposGrupo
             };
 
             return grupoCopa;
+        }
+
+        private async Task<List<EliminatoriasCopa>> ObtenerPlayoffs(int torneoId)
+        {
+            List<EliminatoriasCopa> eliminatoriasCopas = new List<EliminatoriasCopa>();
+
+            return eliminatoriasCopas;    
         }
 
         private async Task ActualizarLA(PosicionLigaAmistosa posicionLigaAmistosa)

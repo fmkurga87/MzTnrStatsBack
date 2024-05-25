@@ -67,15 +67,15 @@ namespace MzTNR.Services.Torneos
 
             if (response.Errores.Count == 0)
             {
-                foreach (var GrupoCopa in request.EquiposGrupo)
+                foreach (var equipo in request.EquiposGrupo)
                 {
-                    await _metodosComunes.ValidarEquipo(GrupoCopa.EquipoId.Value, GrupoCopa.EquipoNombre);
+                    await _metodosComunes.ValidarEquipo(equipo.IdMz.Value, equipo.NombreEquipo);
 
                     FaseGrupo faseGrupo = new FaseGrupo()
                     {
                         TorneoId = request.TorneoId,
                         Grupo = request.Grupo,
-                        EquipoId = GrupoCopa.EquipoId,
+                        EquipoId = equipo.IdMz.Value,
                     };
 
                     _applicationDbContext.FasesGrupos.Add(faseGrupo);
@@ -303,7 +303,7 @@ namespace MzTNR.Services.Torneos
 
             if (grupos.Any())
             {
-                copa.Grupos = new List<GrupoCopa>();
+                copa.Grupos = new List<GrupoCopaConPartidos>();
                 grupos.ForEach(async x => {
                     copa.Grupos.Add(await ObtenerGrupoCopaAsync(idMzCopa, x));
                     });
@@ -314,12 +314,14 @@ namespace MzTNR.Services.Torneos
             return copa;
         } 
 
-        private async Task<GrupoCopa> ObtenerGrupoCopaAsync(int idTorneo, string grupo)
+        private async Task<GrupoCopaConPartidos> ObtenerGrupoCopaAsync(int idTorneo, string grupo)
         {
+            // TODO : Quizas esto no convenga hacerlo pasar por mapper, pero si agregarle includes de Equipos y partidos en el LINQ
             var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync());
             
             List<ResumenPartido> partidosDelGrupo = new List<ResumenPartido>();
 
+            // TODO : Aca da el error
             var partidosGrupo = await _applicationDbContext.Partidos.Where(x => x.TorneoId == idTorneo
                                                                         && x.TipoPartido == 6
                                                                         && equiposGrupo.Select(y => y.EquipoId).Contains(x.EquipoLocalId)
@@ -361,7 +363,7 @@ namespace MzTNR.Services.Torneos
                 }
             ); 
 
-            GrupoCopa grupoCopa = new GrupoCopa
+            GrupoCopaConPartidos grupoCopa = new GrupoCopaConPartidos
             {
                 Grupo = grupo,
                 EquiposGrupo = equiposGrupo,

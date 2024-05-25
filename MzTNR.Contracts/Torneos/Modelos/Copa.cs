@@ -7,7 +7,7 @@ namespace MzTNR.Contracts.Torneos.Modelos
 {
     public class Copa
     {
-        public List<GrupoCopa> Grupos { get; set; }
+        public List<GrupoCopaConPartidos> Grupos { get; set; }
         public List<EliminatoriasCopa> Playoff { get; set; }
     }
 }

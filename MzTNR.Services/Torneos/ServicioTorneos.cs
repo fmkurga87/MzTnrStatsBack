@@ -8,6 +8,8 @@ using System.Xml.Linq;
 using AutoMapper;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
+using MzTNR.Contracts.Compartidos;
+using MzTNR.Contracts.Partidos.Modelos;
 using MzTNR.Contracts.Torneos;
 using MzTNR.Contracts.Torneos.DTOs;
 using MzTNR.Contracts.Torneos.Modelos;
@@ -316,6 +318,8 @@ namespace MzTNR.Services.Torneos
         {
             var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync());
             
+            List<ResumenPartido> partidosDelGrupo = new List<ResumenPartido>();
+
             var partidosGrupo = await _applicationDbContext.Partidos.Where(x => x.TorneoId == idTorneo
                                                                         && x.TipoPartido == 6
                                                                         && equiposGrupo.Select(y => y.EquipoId).Contains(x.EquipoLocalId)
@@ -352,21 +356,46 @@ namespace MzTNR.Services.Torneos
                     }
                     local.DiferenciaGol = local.GolesAFavor - local.GolesEnContra;
                     visitante.DiferenciaGol = visitante.GolesAFavor - visitante.GolesEnContra;
+                    
+                    partidosDelGrupo.Add(_mapper.Map<ResumenPartido>(x));
                 }
             ); 
 
             GrupoCopa grupoCopa = new GrupoCopa
             {
                 Grupo = grupo,
-                EquiposGrupo = equiposGrupo
+                EquiposGrupo = equiposGrupo,
+                PartidosDelGrupo = partidosDelGrupo
             };
 
             return grupoCopa;
         }
 
-        private async Task<List<EliminatoriasCopa>> ObtenerPlayoffs(int torneoId)
+        private async Task<List<EliminatoriasCopa>> ObtenerPlayoffs(int idTorneo)
         {
             List<EliminatoriasCopa> eliminatoriasCopas = new List<EliminatoriasCopa>();
+
+            var partidosPlayoff = await _applicationDbContext.Partidos.Where(x => x.TorneoId == idTorneo
+                                                                        && x.TipoPartido == 7)
+                                                                        .ToListAsync();
+
+            partidosPlayoff.ForEach( x => {
+                var instancia = eliminatoriasCopas.FirstOrDefault(y => (int)y.Instancia == x.Instancia);
+                if (instancia == null)
+                {
+                    var listaPartidos = new List<ResumenPartido>
+                    {
+                        _mapper.Map<ResumenPartido>(x)
+                    };
+                    eliminatoriasCopas.Add(new EliminatoriasCopa(){ Instancia = (EnumInstanciaPartido)x.Instancia, 
+                                                                    Partidos = listaPartidos});
+                }
+                else
+                {
+                    instancia.Partidos.Add(_mapper.Map<ResumenPartido>(x));
+                };
+
+            });                                                                       
 
             return eliminatoriasCopas;    
         }

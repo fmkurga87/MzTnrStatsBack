@@ -309,7 +309,7 @@ namespace MzTNR.Services.Torneos
                     });
             }
             
-            copa.Playoff = await ObtenerPlayoffs(idMzCopa);
+            //copa.Playoff = await ObtenerPlayoffs(idMzCopa);
             
             return copa;
         } 
@@ -317,8 +317,14 @@ namespace MzTNR.Services.Torneos
         private async Task<GrupoCopaConPartidos> ObtenerGrupoCopaAsync(int idTorneo, string grupo)
         {
             // TODO : Quizas esto no convenga hacerlo pasar por mapper, pero si agregarle includes de Equipos y partidos en el LINQ
-            var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(await _applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToListAsync());
-            
+            var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(_applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToList());
+            //306874
+            /*var equiposTest = await _applicationDbContext.FasesGrupos
+                                                    .Where(x => x.TorneoId == idTorneo && x.Grupo == grupo)
+                                                    .Include("Torneo.IdMz.Partido")
+                                                    .Include("Equipos")
+                                                    .ToListAsync();*/
+
             List<ResumenPartido> partidosDelGrupo = new List<ResumenPartido>();
 
             // TODO : Aca da el error
@@ -326,7 +332,10 @@ namespace MzTNR.Services.Torneos
                                                                         && x.TipoPartido == 6
                                                                         && equiposGrupo.Select(y => y.EquipoId).Contains(x.EquipoLocalId)
                                                                          ).ToListAsync();
-            
+            /*equiposTest.ForEach( x => {
+                x.Torneo.Partidos.ForEach()
+            });*/
+
             partidosGrupo.ForEach( x => {
                     var local = equiposGrupo.First(y => y.EquipoId == x.EquipoLocalId);
                     var visitante = equiposGrupo.First(y => y.EquipoId == x.EquipoVisitanteId);

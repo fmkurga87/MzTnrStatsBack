@@ -11,6 +11,7 @@ namespace MzTNR.Contracts.Compartidos
         Dieciseis = 6,
         TreintaYDos = 7,
         SesentaYCuatro = 8,
+        Indeterminada = 9,
 
     }
 }

@@ -336,7 +336,9 @@ namespace MzTNR.Services.Torneos
             var partidosGrupo = await _applicationDbContext.Partidos.Where(x => x.TorneoId == idTorneo
                                                                         && x.TipoPartido == 6
                                                                         && equiposGrupo.Select(y => y.EquipoId).Contains(x.EquipoLocalId)
-                                                                         ).ToListAsync();
+                                                                         )
+                                                                    .Include(x => x.EquipoLocal).Include(x => x.EquipoVisitante)
+                                                                    .ToListAsync();
             /*equiposTest.ForEach( x => {
                 x.Torneo.Partidos.ForEach()
             });*/
@@ -347,9 +349,11 @@ namespace MzTNR.Services.Torneos
                     local.PartidosJugados++;
                     local.GolesAFavor += x.GolesLocal;
                     local.GolesEnContra += x.GolesVisitante;
+                    local.NombreEquipo = x.EquipoLocal.NombreEquipo;
                     visitante.PartidosJugados++;
                     visitante.GolesAFavor += x.GolesVisitante;
                     visitante.GolesEnContra += x.GolesLocal;
+                    visitante.NombreEquipo = x.EquipoVisitante.NombreEquipo;
                     
                     if (x.GolesLocal > x.GolesVisitante)
                     {

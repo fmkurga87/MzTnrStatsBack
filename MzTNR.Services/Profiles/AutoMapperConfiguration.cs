@@ -37,7 +37,9 @@ namespace MzTNR.Services.Profiles
             #region Partidos
             CreateMap<Partido, PartidoDTO>();
             CreateMap<CrearPartidoRequest, Partido>();
-            CreateMap<Partido, ResumenPartido>();
+            CreateMap<Partido, ResumenPartido>()
+                .ForMember(dest => dest.EquipoLocal, opt => opt.MapFrom(source => source.EquipoLocal.NombreEquipo))
+                .ForMember(dest => dest.EquipoVisitante, opt => opt.MapFrom(source => source.EquipoVisitante.NombreEquipo));
             #endregion
 
             #region Provincias

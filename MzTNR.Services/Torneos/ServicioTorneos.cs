@@ -374,7 +374,7 @@ namespace MzTNR.Services.Torneos
             GrupoCopaConPartidos grupoCopa = new GrupoCopaConPartidos
             {
                 Grupo = grupo,
-                EquiposGrupo = equiposGrupo,
+                EquiposGrupo = equiposGrupo.OrderByDescending(x => x.Puntos).ThenByDescending(x => x.DiferenciaGol).ThenByDescending(x => x.GolesAFavor).ToList(),
                 PartidosDelGrupo = partidosDelGrupo
             };
 

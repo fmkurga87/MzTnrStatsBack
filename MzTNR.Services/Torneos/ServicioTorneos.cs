@@ -339,11 +339,11 @@ namespace MzTNR.Services.Torneos
                     local.PartidosJugados++;
                     local.GolesAFavor += x.GolesLocal;
                     local.GolesEnContra += x.GolesVisitante;
-                    local.NombreEquipo = x.EquipoLocal.NombreEquipo;
+                    local.NombreEquipo = local.NombreEquipo == null ? _applicationDbContext.Equipos.FirstOrDefault(x => x.IdMz == local.EquipoId).NombreEquipo : local.NombreEquipo;
                     visitante.PartidosJugados++;
                     visitante.GolesAFavor += x.GolesVisitante;
                     visitante.GolesEnContra += x.GolesLocal;
-                    visitante.NombreEquipo = x.EquipoVisitante.NombreEquipo;
+                    visitante.NombreEquipo = visitante.NombreEquipo == null ? _applicationDbContext.Equipos.FirstOrDefault(x => x.IdMz == visitante.EquipoId).NombreEquipo : visitante.NombreEquipo;
                     
                     if (x.GolesLocal > x.GolesVisitante)
                     {
@@ -396,7 +396,6 @@ namespace MzTNR.Services.Torneos
                 var instancia = eliminatoriasCopas.FirstOrDefault(y => (int)y.Instancia == x.Instancia);
                 if (instancia == null)
                 {
-                    // TODO: Agregar equipos!
                     var listaPartidos = new List<ResumenPartido>
                     {
                         _mapper.Map<Partido, ResumenPartido>(x, opt =>

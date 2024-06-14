@@ -58,7 +58,8 @@ namespace MzTNR.Services.Profiles
                     .ForMember(dest => dest.EnCurso, opt => opt.MapFrom(source => EsActual(source.FechaInicio, source.FechaFin)));
                 CreateMap<Torneo, TorneoCompleto>();
                 CreateMap<CrearTorneoRequest, Torneo>();
-                CreateMap<FaseGrupo, EquipoGrupoCopa>();
+                CreateMap<FaseGrupo, EquipoGrupoCopa>()
+                    .ForMember(dest => dest.NombreEquipo, opt => opt.MapFrom(source => source.Equipo.NombreEquipo));
             #endregion
 
         }   

@@ -322,7 +322,9 @@ namespace MzTNR.Services.Torneos
         private async Task<GrupoCopaConPartidos> ObtenerGrupoCopaAsync(int idTorneo, string grupo)
         {
             //Id para test: 306874
-            var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(_applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo).ToList());
+            var equiposGrupo = _mapper.Map<List<EquipoGrupoCopa>>(_applicationDbContext.FasesGrupos.Where(x => x.TorneoId == idTorneo && x.Grupo == grupo)
+                                                                                                    .Include(x => x.Equipo)
+                                                                                                    .ToList());
 
             List<ResumenPartido> partidosDelGrupo = new List<ResumenPartido>();
 
@@ -339,11 +341,9 @@ namespace MzTNR.Services.Torneos
                     local.PartidosJugados++;
                     local.GolesAFavor += x.GolesLocal;
                     local.GolesEnContra += x.GolesVisitante;
-                    local.NombreEquipo = local.NombreEquipo == null ? _applicationDbContext.Equipos.FirstOrDefault(x => x.IdMz == local.EquipoId).NombreEquipo : local.NombreEquipo;
                     visitante.PartidosJugados++;
                     visitante.GolesAFavor += x.GolesVisitante;
                     visitante.GolesEnContra += x.GolesLocal;
-                    visitante.NombreEquipo = visitante.NombreEquipo == null ? _applicationDbContext.Equipos.FirstOrDefault(x => x.IdMz == visitante.EquipoId).NombreEquipo : visitante.NombreEquipo;
                     
                     if (x.GolesLocal > x.GolesVisitante)
                     {

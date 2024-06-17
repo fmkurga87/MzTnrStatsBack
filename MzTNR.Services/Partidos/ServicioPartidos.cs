@@ -231,7 +231,7 @@ namespace MzTNR.Services.Partidos
                     else
                     {
                         // Verificamos si pertenece al TNR
-                        if (type != "friendly")
+                        if (type != "friendly" && type != "special" && type != "qualification")
                         {
                             partidoDeTNR = await _applicationDbContext.Torneos.AnyAsync(x => x.IdMz == int.Parse(typeId));
                         }
